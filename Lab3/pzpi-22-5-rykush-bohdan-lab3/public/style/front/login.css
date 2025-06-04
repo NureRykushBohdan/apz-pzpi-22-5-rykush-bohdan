@@ -1,0 +1,307 @@
+/* Глобальні стилі */
+html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden; 
+    display: flex;
+    flex-direction: column;
+    font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Сучасний, чистий шрифт */
+    background-color: #eef2f5; /* Дуже світлий, майже білий фон, технологічний */
+    color: #333a45; /* Темно-сірий для основного тексту */
+}
+
+header {
+    display: flex;
+    justify-content: space-between; /* Розміщення лого зліва, навігації та кнопок справа */
+    align-items: center;
+    padding: 15px 40px; /* Оптимізований паддінг */
+    width: 100%;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    transition: box-shadow 0.3s ease, background-color 0.3s ease;
+    position: fixed;
+    background: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Легка початкова тінь */
+    box-sizing: border-box;
+}
+
+header.scrolled {
+    box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.08); /* Більш виражена тінь при скролі */
+}
+
+/* Логотип */
+.logo a {
+    display: flex;
+    align-items: center;
+    font-size: 28px; /* Зменшено для більш витонченого вигляду */
+    font-weight: 700; /* Більш жирний для акценту */
+    color: #2c3e50; /* Темний, насичений синьо-сірий */
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+.logo a:hover {
+    color: #1a252f;
+}
+
+.logo img {
+    height: 32px; /* Відповідно до розміру шрифту */
+    margin-right: 10px;
+}
+
+/* Навігація та кнопки авторизації разом */
+.header-right-content {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+/* Стилі для навігації */
+nav {
+    display: flex;
+    gap: 25px;
+}
+
+nav a {
+    color: #34495e; /* Спокійний синьо-сірий */
+    text-decoration: none;
+    font-size: 17px; /* Оптимальний розмір для навігації */
+    font-weight: 500;
+    transition: color 0.3s ease;
+    padding: 5px 0;
+    position: relative; /* Для анімації підкреслення */
+}
+
+nav a::after { /* Ефект підкреслення при ховері */
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -2px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #3498db; /* Яскравий синій акцент */
+    transition: width 0.3s ease;
+}
+
+nav a:hover::after, nav a.active::after {
+    width: 100%;
+}
+nav a:hover, nav a.active {
+    color: #3498db; /* Яскравий синій при ховері/активності */
+}
+
+
+/* Кнопки авторизації */
+.auth-buttons {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.login-btn {
+    color: #3498db;
+    font-size: 17px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+    padding: 8px 15px;
+    border: 1px solid transparent; /* Для збереження розміру */
+    border-radius: 5px;
+}
+
+.login-btn:hover {
+    color: #2980b9;
+    background-color: #ecf0f1; /* Дуже світлий фон при ховері */
+}
+
+.signup-btn {
+    background: #3498db;
+    color: white;
+    padding: 8px 20px;
+    border-radius: 5px; /* Гостріші кути */
+    font-weight: 500;
+    text-decoration: none;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    font-size: 17px;
+    border: 1px solid #3498db;
+}
+
+.signup-btn:hover {
+    background: #2980b9;
+    border-color: #2980b9;
+    transform: translateY(-1px);
+}
+
+
+
+/* Футер */
+footer {
+    width: 100%;
+    background: #2c3e50; /* Темний синьо-сірий */
+    color: #bdc3c7; /* Світло-сірий текст */
+    text-align: center;
+    padding: 30px 20px;
+    font-size: 15px;
+    margin-top: auto;
+    line-height: 1.6;
+}
+footer p {
+    margin: 5px 0;
+}
+footer a {
+    color: #5dade2; /* Світліший синій для посилань */
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+footer a:hover {
+    color: #85c1e9;
+    text-decoration: underline;
+}
+
+/* Адаптивність */
+@media (max-width: 992px) {
+    .header-right-content {
+        gap: 15px; /* Зменшуємо відстань для компактності */
+    }
+    nav {
+        gap: 15px;
+    }
+    nav a, .login-btn, .signup-btn, #user-name {
+        font-size: 16px;
+    }
+    .intro, .advantage-item { /* Застосовується до advantage-item, якщо він не в grid */
+        flex-direction: column;
+        text-align: center;
+    }
+    .advantage-item.reverse {
+        flex-direction: column;
+    }
+   
+}
+
+@media (max-width: 768px) {
+    header {
+        padding: 10px 20px;
+        justify-content: space-between; 
+    }
+    
+    .header-right-content {
+     
+       flex-wrap: wrap;
+       justify-content: center;
+       gap: 10px;
+       width: 100%;
+       margin-top: 10px; /* Якщо хедер стає column */
+    }
+     nav {
+        order: 2; /* Навігація після кнопок, якщо хедер column */
+        width: 100%;
+        justify-content: center;
+    }
+    .auth-buttons {
+        order: 1;
+    }
+
+
+}
+
+@media (max-width: 480px) {
+
+    footer {
+        padding: 20px 15px;
+        font-size: 14px;
+    }
+}
+main.login-page-main {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding-top: 80px; /* Відступ для фіксованого хедера */
+            padding-bottom: 40px;
+        }
+        .login-container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 420px; /* Трохи ширше для комфорту */
+            text-align: center;
+        }
+        .login-container h2 {
+            color: #2c3e50; /* Темний синьо-сірий */
+            margin-bottom: 25px;
+            font-size: 28px;
+            font-weight: 600;
+        }
+        .login-container .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .login-container label {
+            display: block;
+            margin-bottom: 8px;
+            color: #34495e; /* Спокійний синьо-сірий */
+            font-weight: 500;
+            font-size: 16px;
+        }
+        .login-container input[type="email"],
+        .login-container input[type="password"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ced4da; /* Світліша рамка */
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+        .login-container input[type="email"]:focus,
+        .login-container input[type="password"]:focus {
+            border-color: #3498db; /* Акцентний колір при фокусі */
+            outline: none;
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        }
+        .login-container button[type="submit"] {
+            width: 100%;
+            padding: 12px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 17px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .login-container button[type="submit"]:hover {
+            background-color: #2980b9;
+            transform: translateY(-1px);
+        }
+        .error-message {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 15px;
+            text-align: center;
+        }
+        .register-link {
+            margin-top: 25px;
+            font-size: 15px;
+            color: #566573;
+        }
+        .register-link a {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .register-link a:hover {
+            text-decoration: underline;
+            color: #2980b9;
+        }

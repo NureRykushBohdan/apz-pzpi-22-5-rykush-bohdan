@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us- EcoGuard</title>
+    <link rel="stylesheet" href="/style/front/styles.css"> 
+    <link rel="stylesheet" href="/style/front/login.css"> 
+    <link rel="icon" href="https://placehold.co/32x32/3498db/ffffff?text=EG" type="image/x-icon">
+   
+</head>
+<body>
+
+    <header id="main-header">
+        <div class="logo">
+             <a href="/"> EcoGuard</a>
+        </div>
+        <div class="header-right-content">
+            <nav>
+                <a href="/">Головна</a>
+                <a href="/map">Карта Даних</a>
+                <a href="/about-system">Про Систему</a>
+                <a href="/contact">Контакти</a>
+            </nav>
+            <% if (typeof user !== 'undefined' && user) { %>
+                <div class="user-menu">
+                    <button id="user-name"><%= user.name %> &#9662;</button>
+                    <div class="dropdown-menu" id="dropdown-menu">
+                        <a href="/dashboard">Панель приладів</a>
+                        <a href="/profile">Мій профіль</a>
+                        <a href="/settings">Налаштування</a>
+                        <% if (user.role === "admin") { %>
+                            <a href="/admin-panel">Панель Адміністратора</a>
+                        <% } %>
+                        <a href="/logout">Вийти</a>
+                    </div>
+                </div>
+            <% } else { %>
+                <div class="auth-buttons">
+                    <a href="/login" class="login-btn active">Увійти</a>
+                    <a href="/register" class="signup-btn">Реєстрація</a>
+                </div>
+            <% } %>
+        </div>
+    </header>
+    
+    
+
+    
+    <main>
+        <div class="about-container">
+            <img src="https://nikkme.fra1.cdn.digitaloceanspaces.com/images/About_Us.webp" alt="Paper Chains Decoration" class="about-image">
+            <p class="about-text">
+                Наша команда прагне розробити зручний інструмент як для учнів, так і для вчителів. Прагнемо запропонувати користувачам зручний, але водночас простий інтерфейс. Матеріали відібрані вчителями з понад 10-річним досвідом підготовки до різних тестів – від ЗНО з української мови до складання іспиту на рівень С1 з німецької.
+            </p>
+        </div>
+    </main>
+        
+        
+    
+    
+
+   <footer>
+        <p>© <%= new Date().getFullYear() %> EcoGuard. Програмна система моніторингу екологічного стану місцевості.</p>
+        <p><a href="/privacy-policy">Політика конфіденційності</a> | <a href="/terms-of-use">Умови використання</a></p>
+    </footer>
+    <script src="/js/front/About_Us.js" defer>
+        
+    </script>
+
+  
+</body>
+</html>
+
+    
+    
+    
+   
+   

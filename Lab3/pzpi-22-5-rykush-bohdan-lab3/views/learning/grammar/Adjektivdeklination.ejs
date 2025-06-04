@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/style/learning/grammar/Adjektivdeklination.css">
+</head>
+<body>
+
+    <header id="main-header">
+        <div class="logo">
+            <a href="/start">Adler</a>
+        </div>
+    
+        <div class="user-menu">
+            <button id="user-name"><%= user.name %> ▼</button>
+            <div class="dropdown-menu" id="dropdown-menu">
+                <a href="/profile">Профіль</a>
+                <a href="/settings">Налаштування</a>
+                <% if (user.role === "admin") { %>
+                    <a href="/admin-tools">Інструменти</a>
+                <% } %>
+                <a href="/logout">Вийти</a>
+            </div>
+        </div>
+    </header>
+    
+    
+    <% if (!user.knowledge_level) { %>
+        <div class="test-warning">
+            <p>Перед використанням сайту вам потрібно пройти оцінювальний тест.</p>
+            <a href="/test" class="test-button">Пройти тест</a>
+        </div>
+    <% } %>
+    
+  
+
+   
+        
+        
+    
+    
+
+    <footer>
+        <p>© 2025 Adler. Усі права захищені.</p>
+    </footer>
+    <script src="/js/learning/grammar/Adjektivdeklination.js" defer>
+        
+    </script>
+
+  
+</body>
+</html>
+
+    
+    
+    
+   
+   

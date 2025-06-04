@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Реєстрація | Adler</title>
+    <link rel="stylesheet" href="/style/users/register.css">
+</head>
+<body>
+    <header id="main-header">
+        <div class="logo">
+            <a href="/">Adler</a>
+        </div>
+        <nav>
+            <a href="/">Головна</a>
+            <a href="/about-us">Про нас</a>
+            <a href="/price">Ціни</a>
+            <a href="/contact">Контакти</a>
+        </nav>
+        <div class="auth-buttons">
+            <a href="/login" class="login-btn">Увійти</a>
+            <a href="/register" class="signup-btn">Реєстрація</a>
+        </div>
+    </header>
+    <main>
+        <div id="success-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <h2>Реєстрація успішна!</h2>
+                <p>Ви успішно зареєструвалися. Натисніть кнопку, щоб перейти на головну сторінку.</p>
+                <a href="/" class="button">На головну</a>
+            </div>
+        </div>
+        
+        
+        
+        
+        <div class="register-container">
+            <h2>Реєстрація</h2>
+        
+            <!-- Форма реєстрації -->
+            <form id="register-form">
+                <input type="text" id="name" name="name" placeholder="Ваше ім'я" required>
+                <input type="email" id="email" name="email" placeholder="Email" required>
+                <input type="password" id="password" name="password" placeholder="Пароль" required>
+                <input type="password" id="confirm-password" name="confirm-password" placeholder="Повторіть пароль" required>
+                <p id="error-message" style="color: red; display: none;"></p>
+                <button type="submit">Зареєструватися</button>
+            </form>
+        </div>
+    </main>
+    
+    <footer>
+        <p>&copy; 2025 Adler. Усі права захищені.</p>
+    </footer>
+    
+    <script src="/js/users/register.js"></script>
+    
+    <!-- <script>
+   
+    </script> -->
+</body>
+</html>

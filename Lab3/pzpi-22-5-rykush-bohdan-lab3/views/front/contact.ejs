@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Контакти - EcoGuard</title>
+
+    <link rel="stylesheet" href="/style/front/contact.css"> 
+    <link rel="icon" href="https://placehold.co/32x32/3498db/ffffff?text=EG" type="image/x-icon">
+</head>
+<body>
+    <div id="preloader">
+        <div class="loader"></div>
+    </div>
+     <header id="main-header">
+        <div class="logo">
+            <a href="/"> EcoGuard</a>
+        </div>
+        <div class="header-right-content">
+            <nav>
+                <a href="/" >Головна</a>
+                <a href="/map">Карта Даних</a>
+                <a href="/about-system">Про Систему</a>
+                <a href="/contact" class="active">Контакти</a>
+            </nav>
+            <% if (user) { %>
+                <div class="user-menu">
+                    <button id="user-name"><%= user.name %> &#9662;</button>
+                    <div class="dropdown-menu" id="dropdown-menu">
+                        <a href="/dashboard">Панель приладів</a>
+                        <a href="/profile">Мій профіль</a>
+                        <a href="/settings">Налаштування</a>
+                        <% if (user.role === "admin") { %>
+                            <a href="/admin-panel">Панель Адміністратора</a>
+                        <% } %>
+                        <a href="/logout">Вийти</a>
+                    </div>
+                </div>
+            <% } else { %>
+                <div class="auth-buttons">
+                    <a href="/login" class="login-btn">Увійти</a>
+                    <a href="/register" class="signup-btn">Реєстрація</a>
+                </div>
+            <% } %>
+        </div>
+    </header>
+
+ <main class="contact-page-main">
+        <div class="contact-container-wrapper">
+            <h2>Зв'яжіться з нами</h2>
+
+            <% if (typeof message !== "undefined" && message && message.type === "success") { %>
+                <div class="success-message">
+                    <p><%= message.text %></p>
+                </div>
+            <% } else if (typeof message !== "undefined" && message && message.type === "error") { %>
+                <div class="error-message-contact">
+                    <p><%= message.text %></p>
+                </div>
+            <% } %>
+
+            <form id="contact-form" action="/contact" method="POST">
+                <div class="form-group">
+                    <label for="email">Ваш Email:</label>
+                    <input type="email" id="email" name="email" 
+                           value="<%= (typeof user !== 'undefined' && user && user.email) ? user.email : '' %>" 
+                           required <%= (typeof user !== 'undefined' && user) ? "readonly" : "" %>>
+                </div>
+                
+                <div class="form-group">
+                    <label for="message">Ваше повідомлення:</label>
+                    <textarea id="message" name="message" rows="5" maxlength="600" required placeholder="Введіть ваше повідомлення тут..."></textarea>
+                    <p id="char-count">0 / 600</p>
+                </div>
+            
+                <button type="submit">Надіслати повідомлення</button>
+            </form>
+        </div>
+    </main>
+
+    <footer>
+        <p>© <%= new Date().getFullYear() %> EcoGuard. Програмна система моніторингу екологічного стану місцевості.</p>
+        <p><a href="/privacy-policy">Політика конфіденційності</a> | <a href="/terms-of-use">Умови використання</a></p>
+    </footer>
+
+
+    <script src="/js/front/contact.js" defer></script>
+
+</body>
+</html>

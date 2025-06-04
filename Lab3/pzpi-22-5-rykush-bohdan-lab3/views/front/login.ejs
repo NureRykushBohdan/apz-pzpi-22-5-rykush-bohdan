@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вхід - EcoGuard</title>
+    <link rel="stylesheet" href="/style/front/styles.css"> 
+    <link rel="stylesheet" href="/style/front/login.css"> 
+    <link rel="icon" href="https://placehold.co/32x32/3498db/ffffff?text=EG" type="image/x-icon">
+   
+</head>
+<body>
+
+    <header id="main-header">
+        <div class="logo">
+             <a href="/"> EcoGuard</a>
+        </div>
+        <div class="header-right-content">
+            <nav>
+                <a href="/">Головна</a>
+                <a href="/map">Карта Даних</a>
+                <a href="/about-system">Про Систему</a>
+                <a href="/contact">Контакти</a>
+            </nav>
+            <% if (typeof user !== 'undefined' && user) { %>
+                <div class="user-menu">
+                    <button id="user-name"><%= user.name %> &#9662;</button>
+                    <div class="dropdown-menu" id="dropdown-menu">
+                        <a href="/dashboard">Панель приладів</a>
+                        <a href="/profile">Мій профіль</a>
+                        <a href="/settings">Налаштування</a>
+                        <% if (user.role === "admin") { %>
+                            <a href="/admin-panel">Панель Адміністратора</a>
+                        <% } %>
+                        <a href="/logout">Вийти</a>
+                    </div>
+                </div>
+            <% } else { %>
+                <div class="auth-buttons">
+                    <a href="/login" class="login-btn active">Увійти</a>
+                    <a href="/register" class="signup-btn">Реєстрація</a>
+                </div>
+            <% } %>
+        </div>
+    </header>
+    
+    <main class="login-page-main">
+        <div class="login-container">
+            <h2>Вхід до системи EcoGuard</h2>
+            
+            <% if (typeof message !== 'undefined' && message && message.length > 0) { %>
+                <div class="error-message">
+                    <p><%= message %></p>
+                </div>
+            <% } %>
+
+            <form action="/login" method="POST">
+                <input type="hidden" name="redirect" value="<%= typeof redirect !== 'undefined' ? redirect : '/' %>">
+                <div class="form-group">
+                    <label for="email">Електронна пошта</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Пароль</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit">Увійти</button>
+            </form>
+            <div class="register-link">
+                <p>Немає облікового запису? <a href="/register">Зареєструватися</a></p>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>© <%= new Date().getFullYear() %> EcoGuard. Програмна система моніторингу екологічного стану місцевості.</p>
+        <p><a href="/privacy-policy">Політика конфіденційності</a> | <a href="/terms-of-use">Умови використання</a></p>
+    </footer>
+
+    <script src="/js/front/login.js" defer></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const navLinks = document.querySelectorAll('header nav a');
+            const authLoginBtn = document.querySelector('header .auth-buttons .login-btn');
+            const currentPath = window.location.pathname;
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === currentPath) {
+                    link.classList.add('active');
+                }
+            });
+            
+            if (authLoginBtn && currentPath === '/login') {
+                authLoginBtn.classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>
