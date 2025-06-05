@@ -4,6 +4,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /**
      * Рендерить таблицю з даними для вкладки "Управління даними".
+     * @param {Array} data - Масив об'єктів для відображення.
+     * @param {string} containerId - ID контейнера, куди буде вставлено таблицю.
      */
     const renderDataTable = (data, containerId) => {
         const container = document.getElementById(containerId);
@@ -34,6 +36,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /**
      * Додає логіку сортування до таблиць даних.
+     * @param {Array} data - Оригінальний (несортований) масив даних.
+     * @param {string} containerId - ID контейнера таблиці.
      */
     const addDataTableSortListeners = (data, containerId) => {
         const headers = document.querySelectorAll(`#${containerId} th.sortable`);
@@ -57,13 +61,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
-
     // --- 2. НАЛАШТУВАННЯ ОСНОВНИХ ВКЛАДОК ---
     const mainTabLinks = document.querySelectorAll('.tab-link');
     mainTabLinks.forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
-            document.querySelector('.tab-link.active')?.classList.remove('active');
+            const currentActive = document.querySelector('.tab-link.active');
+            if (currentActive) currentActive.classList.remove('active');
             link.classList.add('active');
             
             document.querySelector('.tab-content.active')?.classList.remove('active');
@@ -71,7 +75,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if(targetTab) targetTab.classList.add('active');
 
             if (link.dataset.tab === 'data') {
-                document.querySelector('.data-tab-link')?.click();
+                const firstDataTab = document.querySelector('.data-tab-link');
+                if (firstDataTab && !firstDataTab.classList.contains('active')) {
+                    firstDataTab.click();
+                }
             }
         });
     });
@@ -93,8 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const applyUserSearch = () => {
             const searchTerm = searchInput.value.toLowerCase();
-            const filteredUsers = allUsersData.filter(user => user.name.toLowerCase().includes(searchTerm) || user.email.toLowerCase().includes(searchTerm));
-            renderUserTable(filteredUsers);
+            renderUserTable(allUsersData.filter(user => user.name.toLowerCase().includes(searchTerm) || user.email.toLowerCase().includes(searchTerm)));
         };
         
         searchInput.addEventListener('input', applyUserSearch);
@@ -107,8 +113,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 try {
                     const response = await fetch(`/api/admin/users/${userId}`, { method: 'DELETE' });
                     const result = await response.json();
-                    if(result.success) { event.target.closest('tr').remove(); alert(result.message); } 
-                    else { alert(`Помилка: ${result.message}`); }
+                    if (result.success) {
+                        alert(result.message);
+                        const userIndex = allUsersData.findIndex(u => u.id == userId);
+                        if (userIndex > -1) allUsersData.splice(userIndex, 1);
+                        applyUserSearch();
+                    } else { alert(`Помилка: ${result.message}`); }
                 } catch (err) { alert('Сталася помилка на клієнті.'); }
             }
         });
@@ -117,11 +127,14 @@ document.addEventListener('DOMContentLoaded', () => {
             if (event.target.classList.contains('role-select')) {
                 const userId = event.target.dataset.userId;
                 const newRole = event.target.value;
-                if (!confirm(`Змінити роль для ID ${userId} на "${newRole}"?`)) { event.target.value = newRole === 'admin' ? 'user' : 'admin'; return; }
+                const originalRole = newRole === 'admin' ? 'user' : 'admin';
+                if (!confirm(`Змінити роль для ID ${userId} на "${newRole}"?`)) { event.target.value = originalRole; return; }
                 try {
                     const response = await fetch(`/api/admin/users/${userId}/update-role`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ newRole }) });
-                    alert((await response.json()).message);
-                } catch (err) { alert('Сталася помилка на клієнті.'); }
+                    const result = await response.json();
+                    alert(result.message);
+                    if (!result.success) event.target.value = originalRole;
+                } catch (err) { alert('Сталася помилка на клієнті.'); event.target.value = originalRole; }
             }
         });
     }

@@ -628,19 +628,22 @@ app.get("/api/sensors/:id/history", async (req, res) => {
 });
 
 // Маршрут для відображення самої сторінки адмін-панелі
+// В файлі server.js
+
 app.get('/admin', checkAdmin, async (req, res) => {
     try {
-        // Отримуємо всіх користувачів з бази даних, крім поточного адміна
-        const result = await pool.query('SELECT id, name, email, role, is_verified FROM users WHERE id != $1 ORDER BY id ASC', [req.session.user.id]);
+        // Отримуємо всіх користувачів
+        const result = await pool.query('SELECT id, name, email, role, is_verified FROM users ORDER BY id ASC');
         const users = result.rows;
         
+        // Передаємо список користувачів у шаблон
         res.render('system/admin', {
             title: 'Панель адміністратора',
             user: req.session.user,
-            users: users, // Передаємо список користувачів у шаблон
+            users: users, 
             message: req.session.message
         });
-        req.session.message = null; // Очищуємо повідомлення
+        req.session.message = null;
     } catch (err) {
         console.error("Помилка завантаження адмін-панелі:", err);
         res.status(500).send("Помилка сервера");
@@ -735,6 +738,77 @@ app.get('/api/admin/export/:tableName', checkAdmin, async (req, res) => {
         res.status(500).send('Помилка сервера');
     }
 });
+
+// API для управління користувачами
+app.post('/api/admin/users/:id/update-role', checkAdmin, async (req, res) => {
+    const { id } = req.params;
+    const { newRole } = req.body;
+    if (!['admin', 'user'].includes(newRole)) {
+        return res.status(400).json({ success: false, message: 'Невірна роль' });
+    }
+    try {
+        await pool.query('UPDATE users SET role = $1 WHERE id = $2', [newRole, id]);
+        res.json({ success: true, message: 'Роль оновлено' });
+    } catch (err) { res.status(500).json({ success: false, message: 'Помилка сервера' }); }
+});
+
+app.delete('/api/admin/users/:id', checkAdmin, async (req, res) => {
+    try {
+        await pool.query('DELETE FROM users WHERE id = $1', [req.params.id]);
+        res.json({ success: true, message: 'Користувача видалено' });
+    } catch (err) { res.status(500).json({ success: false, message: 'Помилка сервера' }); }
+});
+
+// API для отримання даних таблиць
+app.get('/api/admin/sensors', checkAdmin, async (req, res) => {
+    try {
+        const result = await pool.query('SELECT * FROM sensors ORDER BY sensor_id ASC');
+        res.json(result.rows);
+    } catch (err) { res.status(500).json({ success: false, message: 'Помилка сервера' }); }
+});
+
+app.get('/api/admin/readings', checkAdmin, async (req, res) => {
+    try {
+        const result = await pool.query('SELECT * FROM sensor_readings ORDER BY timestamp DESC LIMIT 100');
+        res.json(result.rows);
+    } catch (err) { res.status(500).json({ success: false, message: 'Помилка сервера' }); }
+});
+
+app.get('/api/admin/messages', checkAdmin, async (req, res) => {
+    try {
+        const result = await pool.query('SELECT * FROM messages ORDER BY created_at DESC');
+        res.json(result.rows);
+    } catch (err) { res.status(500).json({ success: false, message: 'Помилка сервера' }); }
+});
+
+
+// API для експорту таблиці в CSV
+app.get('/api/admin/export/:tableName', checkAdmin, async (req, res) => {
+    const { tableName } = req.params;
+    const allowedTables = ['users', 'sensors', 'sensor_readings', 'messages'];
+    if (!allowedTables.includes(tableName)) {
+        return res.status(400).send('Неприпустима назва таблиці');
+    }
+    try {
+        const result = await pool.query(`SELECT * FROM ${tableName}`);
+        const data = result.rows;
+        if (data.length === 0) return res.status(404).send('Таблиця порожня');
+        
+        const headers = Object.keys(data[0]);
+        let csv = headers.join(',') + '\n';
+        data.forEach(row => {
+            csv += headers.map(header => JSON.stringify(row[header])).join(',') + '\n';
+        });
+
+        res.header('Content-Type', 'text/csv');
+        res.attachment(`${tableName}-${Date.now()}.csv`);
+        res.send(csv);
+    } catch (err) {
+        console.error(`Помилка експорту ${tableName}:`, err);
+        res.status(500).send('Помилка сервера');
+    }
+});
+
 
 // Запуск сервера
 app.listen(port, () => {
