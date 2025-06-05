@@ -1,21 +1,198 @@
-.admin-main { max-width: 1200px; margin: 0 auto; padding: 100px 20px 40px; }
-h1, h2 { color: #2c3e50; }
+/* === ЗАГАЛЬНІ СТИЛІ === */
+:root {
+    --primary-color: #3498db;
+    --dark-color: #2c3e50;
+    --light-gray-color: #f4f7f9;
+    --border-color: #e9ecef;
+    --text-color: #333;
+    --white-color: #ffffff;
+    --danger-color: #e74c3c;
+    --success-color: #27ae60;
+}
 
-/* Стилі для вкладок (табів) */
-.admin-tabs { border-bottom: 2px solid #ddd; margin-bottom: 20px; }
-.tab-link { background: none; border: none; padding: 15px 20px; font-size: 16px; cursor: pointer; transition: color 0.2s, border-bottom 0.2s; border-bottom: 3px solid transparent; }
-.tab-link.active { color: #3498db; border-bottom-color: #3498db; font-weight: bold; }
-.tab-content { display: none; }
-.tab-content.active { display: block; }
+.admin-main {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 100px 20px 40px;
+}
 
-/* Стилі для таблиці */
-.table-container { overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #ddd; }
-th { background-color: #f8f9fa; }
-tbody tr:hover { background-color: #f1f1f1; }
+.admin-main h1 {
+    font-size: 2.5rem;
+    color: var(--dark-color);
+    margin-bottom: 20px;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 10px;
+}
 
-/* Стилі для елементів управління */
-.role-select { padding: 5px; border-radius: 4px; border: 1px solid #ccc; }
-.delete-btn { background-color: #e74c3c; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; }
-.delete-btn:hover { background-color: #c0392b; }
+/* === СТИЛІ ДЛЯ СИСТЕМИ ВКЛАДОК (ТАБІВ) === */
+.admin-tabs {
+    border-bottom: 1px solid #ccc;
+    margin-bottom: 25px;
+}
+
+.tab-link {
+    background: none;
+    border: none;
+    padding: 15px 25px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -1px; /* Компенсація бордера */
+    color: #555;
+}
+.tab-link:hover {
+    color: var(--primary-color);
+}
+.tab-link.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+    font-weight: 600;
+}
+
+.tab-content {
+    display: none;
+    padding: 25px;
+    background-color: var(--white-color);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+.tab-content.active {
+    display: block;
+}
+.tab-content h2 {
+    margin-top: 0;
+}
+
+/* === СТИЛІ ДЛЯ ВКЛАДКИ "УПРАВЛІННЯ ДАНИМИ" === */
+.data-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+.data-tab-link {
+    padding: 8px 16px;
+    border: 1px solid var(--border-color);
+    background-color: var(--light-gray-color);
+    cursor: pointer;
+    border-radius: 20px; /* Більш заокруглені кнопки */
+    transition: all 0.2s ease-in-out;
+}
+.data-tab-link:hover {
+    background-color: #e2e6ea;
+}
+.data-tab-link.active {
+    background-color: var(--primary-color);
+    color: var(--white-color);
+    border-color: var(--primary-color);
+}
+.content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* === СТИЛІ ДЛЯ ТАБЛИЦЬ === */
+.table-container {
+    overflow-x: auto;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+    vertical-align: middle;
+}
+thead th {
+    background-color: var(--light-gray-color);
+    font-weight: 600;
+    color: var(--dark-color);
+}
+tbody tr:nth-child(even) {
+    background-color: var(--light-gray-color);
+}
+tbody tr:hover {
+    background-color: #e9ecef;
+}
+td {
+    font-size: 0.9rem;
+}
+
+/* Сортування */
+th.sortable {
+    cursor: pointer;
+    position: relative;
+    padding-right: 25px;
+}
+th.sortable::after {
+    content: ' \2195'; /* Стрілки вгору-вниз */
+    position: absolute;
+    right: 10px;
+    opacity: 0.4;
+    transition: opacity 0.2s;
+}
+th.sortable:hover::after {
+    opacity: 1;
+}
+th.sortable.asc::after { content: ' \2193'; opacity: 1; } /* Стрілка вниз */
+th.sortable.desc::after { content: ' \2191'; opacity: 1; } /* Стрілка вгору */
+
+
+/* === СТИЛІ ДЛЯ КНОПОК ТА ПОЛІВ === */
+.role-select {
+    padding: 6px 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    background-color: var(--white-color);
+}
+.delete-btn {
+    background-color: var(--danger-color);
+    color: var(--white-color);
+    border: none;
+    padding: 6px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.delete-btn:hover {
+    background-color: #c0392b;
+}
+
+.export-btn {
+    background-color: var(--success-color);
+    color: var(--white-color);
+    padding: 8px 15px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 14px;
+    transition: background-color 0.2s;
+}
+.export-btn:hover {
+    background-color: #229954;
+}
+.filter-search-bar {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: var(--light-gray-color);
+    border-radius: 6px;
+}
+
+.filter-search-bar input[type="text"],
+.filter-search-bar select {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.filter-search-bar input[type="text"] {
+    flex-grow: 1; /* Поле пошуку займає вільне місце */
+}

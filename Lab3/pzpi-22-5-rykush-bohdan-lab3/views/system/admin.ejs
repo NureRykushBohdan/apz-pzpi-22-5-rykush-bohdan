@@ -12,64 +12,80 @@
 <body>
 
   <%- include('../partials/header') %>
-<main class="admin-main">
+   <main class="admin-main">
         <h1>Панель адміністратора</h1>
 
-        <% if (message) { %>
+        <% if (typeof message !== 'undefined' && message) { %>
             <div class="toast show"><%= message %></div>
         <% } %>
 
         <div class="admin-tabs">
-            <button class="tab-link active" data-tab="users">Управління користувачами</button>
-            <button class="tab-link" data-tab="data">Управління даними</button>
+            <button class="tab-link active" data-tab="data">Управління даними</button>
+            <button class="tab-link" data-tab="users">Управління користувачами</button>
             <button class="tab-link" data-tab="backup">Резервне копіювання</button>
         </div>
 
-        <div id="users" class="tab-content active">
-            <h2>Список користувачів системи</h2>
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Ім'я</th>
-                            <th>Email</th>
-                            <th>Роль</th>
-                            <th>Верифікований</th>
-                            <th>Дії</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% users.forEach(u => { %>
-                            <tr data-user-id="<%= u.id %>">
-                                <td><%= u.id %></td>
-                                <td><%= u.name %></td>
-                                <td><%= u.email %></td>
-                                <td>
-                                    <select class="role-select" data-user-id="<%= u.id %>">
-                                        <option value="user" <%= u.role === 'user' ? 'selected' : '' %>>User</option>
-                                        <option value="admin" <%= u.role === 'admin' ? 'selected' : '' %>>Admin</option>
-                                    </select>
-                                </td>
-                                <td><%= u.is_verified ? 'Так' : 'Ні' %></td>
-                                <td>
-                                    <button class="delete-btn" data-user-id="<%= u.id %>">Видалити</button>
-                                </td>
-                            </tr>
-                        <% }) %>
-                    </tbody>
-                </table>
+        <div id="data" class="tab-content active">
+            <h2>Управління даними системи</h2>
+            <div class="data-management-panel">
+                <div class="data-tabs">
+                    <button class="data-tab-link" data-table="sensors">Сенсори</button>
+                    <button class="data-tab-link" data-table="readings">Показники</button>
+                    <button class="data-tab-link" data-table="messages">Повідомлення</button>
+                </div>
+                <div class="data-content">
+<div id="sensors-content" class="data-table-content">
+    <div class="content-header">
+        <h3>Таблиця: sensors</h3>
+        <a href="/api/admin/export/sensors" class="export-btn">Експорт в CSV</a>
+    </div>
+
+    <div class="filter-search-bar">
+        <input type="text" id="sensor-search-input" placeholder="Пошук за назвою або описом...">
+        <select id="sensor-type-filter">
+            <option value="all">Всі типи</option>
+            <option value="air">Повітря</option>
+            <option value="water">Вода</option>
+            <option value="noise">Шум</option>
+        </select>
+    </div>
+
+    <div class="table-container" id="sensors-table-container"></div>
+</div>
+                        <div class="table-container" id="sensors-table-container"></div>
+                    </div>
+                    <div id="readings-content" class="data-table-content" style="display: none;">
+                         <div class="content-header">
+                            <h3>Таблиця: sensor_readings (останні 100)</h3>
+                            <a href="/api/admin/export/sensor_readings" class="export-btn">Експорт в CSV</a>
+                        </div>
+                        <div class="table-container" id="readings-table-container"></div>
+                    </div>
+                     <div id="messages-content" class="data-table-content" style="display: none;">
+                         <div class="content-header">
+                            <h3>Таблиця: messages</h3>
+                            <a href="/api/admin/export/messages" class="export-btn">Експорт в CSV</a>
+                        </div>
+                        <div class="table-container" id="messages-table-container"></div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div id="data" class="tab-content">
-            <h2>Управління даними системи</h2>
-            <p>Цей розділ у розробці. Тут можна буде керувати датчиками, очищувати старі показники тощо.</p>
+              <div id="users" class="tab-content">
+            <h2>Список користувачів системи</h2>
+            
+            <div class="filter-search-bar">
+                <input type="text" id="user-search-input" placeholder="Пошук за іменем або email...">
+            </div>
+
+            <div class="table-container" id="users-table-container">
+                </div>
         </div>
 
         <div id="backup" class="tab-content">
             <h2>Резервне копіювання та відновлення</h2>
-            <p>Цей розділ у розробці. Тут будуть функції для експорту та імпорту даних і налаштувань.</p>
+            <p>Цей розділ у розробці.</p>
         </div>
     </main>
 

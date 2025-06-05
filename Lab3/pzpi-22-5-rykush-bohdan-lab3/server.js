@@ -676,6 +676,66 @@ app.delete('/api/admin/users/:id', checkAdmin, async (req, res) => {
         res.status(500).json({ success: false, message: 'Помилка сервера' });
     }
 });
+
+// В файлі server.js
+
+// API: Отримання всіх сенсорів
+app.get('/api/admin/sensors', checkAdmin, async (req, res) => {
+    try {
+        const result = await pool.query('SELECT * FROM sensors ORDER BY sensor_id ASC');
+        res.json(result.rows);
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'Помилка сервера' });
+    }
+});
+
+// API: Отримання всіх показників
+app.get('/api/admin/readings', checkAdmin, async (req, res) => {
+    try {
+        // Обережно! Цей запит може повернути дуже багато даних.
+        // У реальному проєкті тут обов'язково має бути пагінація (LIMIT/OFFSET).
+        const result = await pool.query('SELECT * FROM sensor_readings ORDER BY timestamp DESC LIMIT 100'); // Обмежуємо вивід до 100 останніх записів
+        res.json(result.rows);
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'Помилка сервера' });
+    }
+});
+
+// API: Експорт таблиці в CSV
+app.get('/api/admin/export/:tableName', checkAdmin, async (req, res) => {
+    const { tableName } = req.params;
+    
+    // Білий список дозволених для експорту таблиць
+    const allowedTables = ['users', 'sensors', 'sensor_readings', 'messages'];
+    if (!allowedTables.includes(tableName)) {
+        return res.status(400).send('Неприпустима назва таблиці');
+    }
+
+    try {
+        const result = await pool.query(`SELECT * FROM ${tableName}`);
+        const data = result.rows;
+
+        if (data.length === 0) {
+            return res.status(404).send('Таблиця порожня або не існує');
+        }
+
+        // Конвертація JSON в CSV
+        const headers = Object.keys(data[0]);
+        let csv = headers.join(',') + '\n';
+        data.forEach(row => {
+            csv += headers.map(header => JSON.stringify(row[header])).join(',') + '\n';
+        });
+
+        res.header('Content-Type', 'text/csv');
+        res.attachment(`${tableName}-${Date.now()}.csv`);
+        res.send(csv);
+
+    } catch (err) {
+        console.error(`Помилка експорту таблиці ${tableName}:`, err);
+        res.status(500).send('Помилка сервера');
+    }
+});
+
 // Запуск сервера
 app.listen(port, () => {
     console.log(`Сервер запущено на http://localhost:${port}`);
