@@ -87,7 +87,12 @@ app.get("/", (req, res) => {
     }
     res.render("front/index", { title: "Головна сторінка", user: req.session.user });
 });
-
+app.get("/admin-panel", (req, res) => {
+    if (!req.session.user && req.cookies.user) {
+        req.session.user = JSON.parse(req.cookies.user);
+    }
+    res.render("system/admin-panel", { title: "Адмін панель", user: req.session.user });
+});
 app.get("/login", (req, res) => {
     const redirectUrl = req.query.redirect || "/";
     res.render("front/login", { message: req.session.message || "", redirect: redirectUrl });
