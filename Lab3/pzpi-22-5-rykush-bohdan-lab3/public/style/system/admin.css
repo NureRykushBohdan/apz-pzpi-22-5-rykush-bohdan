@@ -33,3 +33,28 @@ th.sortable.desc::after { content: ' \2191'; opacity: 1; }
 .filter-search-bar { display: flex; gap: 15px; margin-bottom: 20px; padding: 15px; background-color: var(--light-gray-color); border-radius: 6px; }
 .filter-search-bar input[type="text"], .filter-search-bar select { padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; }
 .filter-search-bar input[type="text"] { flex-grow: 1; }
+.status-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+.status-widget {
+    background-color: var(--light-gray-color);
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+.status-widget.wide {
+    grid-column: span 2; /* Робимо віджет пам'яті ширшим */
+}
+.status-widget h4 {
+    margin-top: 0;
+    color: var(--dark-color);
+}
+.status-widget .large-text {
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    text-align: center;
+    margin: 10px 0 0 0;
+}

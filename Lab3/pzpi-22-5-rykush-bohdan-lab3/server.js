@@ -1,6 +1,6 @@
 require("dotenv").config();
 const express = require("express");
-const path = require("path");
+const path =require("path");
 const { Pool } = require("pg");
 const bcrypt = require("bcryptjs");
 const session = require("express-session");
@@ -9,31 +9,23 @@ const crypto = require("crypto");
 const multer = require("multer");
 const pgSession = require("connect-pg-simple")(session);
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
-const multerS3 = require("multer-s3");
-const sharp = require("sharp"); 
+const sharp = require("sharp");
+const cookieParser = require("cookie-parser");
+const { createServer } = require('http');
+const { Server } = require("socket.io");
+const si = require('systeminformation');
 
-
-
-
+// --- 1. ІНІЦІАЛІЗАЦІЯ ---
 const app = express();
+const httpServer = createServer(app);
+const io = new Server(httpServer);
+
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
-
-
-const cookieParser = require("cookie-parser");
 app.use(cookieParser());
-
-
-const port = process.env.PORT || 3000;
-
-
 app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "views")); 
-
-app.use(express.urlencoded({ extended: true }));
-
-app.use(express.json());
+app.set("views", path.join(__dirname, "views"));
 
 
 
@@ -630,20 +622,19 @@ app.get("/api/sensors/:id/history", async (req, res) => {
 // Маршрут для відображення самої сторінки адмін-панелі
 // В файлі server.js
 
+// server.js
+
 app.get('/admin', checkAdmin, async (req, res) => {
     try {
         // Отримуємо всіх користувачів
         const result = await pool.query('SELECT id, name, email, role, is_verified FROM users ORDER BY id ASC');
-        const users = result.rows;
         
-        // Передаємо список користувачів у шаблон
+        // 🔥 ВАЖЛИВО: Передаємо масив користувачів під іменем 'users' у шаблон
         res.render('system/admin', {
             title: 'Панель адміністратора',
             user: req.session.user,
-            users: users, 
-            message: req.session.message
+            users: result.rows, // <-- Ось ця змінна має бути
         });
-        req.session.message = null;
     } catch (err) {
         console.error("Помилка завантаження адмін-панелі:", err);
         res.status(500).send("Помилка сервера");
@@ -810,7 +801,25 @@ app.get('/api/admin/export/:tableName', checkAdmin, async (req, res) => {
 });
 
 
-// Запуск сервера
-app.listen(port, () => {
-    console.log(`Сервер запущено на http://localhost:${port}`);
+io.on('connection', (socket) => {
+    const intervalId = setInterval(async () => {
+        try {
+            const [cpu, mem, osInfo, dbStats] = await Promise.all([
+                si.currentLoad(), si.mem(), si.osInfo(),
+                pool.query(`SELECT (SELECT COUNT(*) FROM users) AS users, (SELECT COUNT(*) FROM sensors) AS sensors, (SELECT COUNT(*) FROM sensor_readings) AS readings, (SELECT COUNT(*) FROM messages) AS messages`)
+            ]);
+            const stats = {
+                cpu: cpu.currentLoad.toFixed(2),
+                memory: { used: (mem.used / 1073741824).toFixed(2), total: (mem.total / 1073741824).toFixed(2) },
+                os: `${osInfo.distro} (${osInfo.platform})`,
+                db: dbStats.rows[0]
+            };
+            socket.emit('server-stats', stats);
+        } catch (e) { console.error('Помилка збору статистики:', e); }
+    }, 2000);
+    socket.on('disconnect', () => clearInterval(intervalId));
 });
+
+// --- 6. ЗАПУСК СЕРВЕРА ---
+const port = process.env.PORT || 3000;
+httpServer.listen(port, () => console.log(`Сервер запущено на http://localhost:${port}`));

@@ -8,11 +8,13 @@
     <link rel="stylesheet" href="/style/system/admin.css"> 
      <link rel="stylesheet" href="/style/partials/footer_header.css">
     <link rel="icon" href="https://placehold.co/32x32/3498db/ffffff?text=EG" type="image/x-icon">
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
   <%- include('../partials/header') %>
-   <main class="admin-main">
+   <main class="admin-main" data-users='<%- JSON.stringify(users || []) %>'>
         <h1>Панель адміністратора</h1>
 
         <% if (typeof message !== 'undefined' && message) { %>
@@ -84,17 +86,29 @@
                 </div>
         </div>
 
-        <div id="backup" class="tab-content">
-            <h2>Резервне копіювання та відновлення</h2>
-            <p>Цей розділ у розробці.</p>
+<div id="status" class="tab-content">
+            <h2>Стан сервера та статистика</h2>
+            <div class="status-grid">
+                <div class="status-widget"><h4>Навантаження CPU</h4><p class="large-text"><span id="cpu-load">0</span>%</p></div>
+                <div class="status-widget"><h4>Використання RAM</h4><p class="large-text"><span id="mem-usage">0</span>%</p><p id="mem-info">Завантаження...</p></div>
+                <div class="status-widget"><h4>Операційна система</h4><p id="os-info">Завантаження...</p></div>
+            </div>
+            <h3>Статистика Бази Даних</h3>
+            <div class="status-grid">
+                <div class="status-widget"><h4>Користувачі</h4><p class="large-text" id="db-users">0</p></div>
+                <div class="status-widget"><h4>Сенсори</h4><p class="large-text" id="db-sensors">0</p></div>
+                <div class="status-widget"><h4>Показники</h4><p class="large-text" id="db-readings">0</p></div>
+                <div class="status-widget"><h4>Повідомлення</h4><p class="large-text" id="db-messages">0</p></div>
+            </div>
         </div>
     </main>
 
     <%- include('../partials/footer') %>
 
 
-    <script src="/js/system/admin.js" defer></script>
+    
 <script src="/js/partials/footer.js" defer></script>
+<script src="/js/system/admin.js" defer></script>
 <script>
         
     </script>

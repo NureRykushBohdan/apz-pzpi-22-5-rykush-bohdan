@@ -85,6 +85,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 3. НАЛАШТУВАННЯ ВКЛАДКИ "УПРАВЛІННЯ КОРИСТУВАЧАМИ" ---
     const userTabContent = document.getElementById('users');
+    const mainElement = document.querySelector('.admin-main');
+    const allUsersData = JSON.parse(mainElement.dataset.users || '[]');
     if (userTabContent && typeof allUsersData !== 'undefined') {
         const searchInput = document.getElementById('user-search-input');
         const usersTableContainer = document.getElementById('users-table-container');
@@ -189,7 +191,34 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
+    
+    const statusTab = document.getElementById('status');
+    if (statusTab) {
+        const socket = io();
+        const cpuLoadEl = document.getElementById('cpu-load');
+        const memUsageEl = document.getElementById('mem-usage');
+        const memInfoEl = document.getElementById('mem-info');
+        const osInfoEl = document.getElementById('os-info');
+        const dbUsersEl = document.getElementById('db-users');
+        const dbSensorsEl = document.getElementById('db-sensors');
+        const dbReadingsEl = document.getElementById('db-readings');
+        const dbMessagesEl = document.getElementById('db-messages');
+        
+        socket.on('server-stats', (stats) => {
+            cpuLoadEl.textContent = stats.cpu;
+            memUsageEl.textContent = ((parseFloat(stats.memory.used) / parseFloat(stats.memory.total)) * 100).toFixed(1);
+            memInfoEl.textContent = `${stats.memory.used} GB / ${stats.memory.total} GB`;
+            osInfoEl.textContent = stats.os;
+            dbUsersEl.textContent = stats.db.users;
+            dbSensorsEl.textContent = stats.db.sensors;
+            dbReadingsEl.textContent = stats.db.readings;
+            dbMessagesEl.textContent = stats.db.messages;
+        });
+    }
+    
 
     // --- 5. ІНІЦІАЛІЗАЦІЯ ---
     document.querySelector('.tab-link.active')?.click();
+
+
 });
