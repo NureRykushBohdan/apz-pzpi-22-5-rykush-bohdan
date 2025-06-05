@@ -5,9 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Контакти - EcoGuard</title>
 
-    <link rel="stylesheet" href="/style/system/admin.css"> 
-     <link rel="stylesheet" href="/style/partials/footer_header.css">
-    <link rel="icon" href="https://placehold.co/32x32/3498db/ffffff?text=EG" type="image/x-icon">
+<link rel="stylesheet" href="/style/system/admin.css">
+    <link rel="stylesheet" href="/style/partials/footer_header.css">
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -17,54 +16,54 @@
    <main class="admin-main" data-users='<%- JSON.stringify(users || []) %>'>
         <h1>Панель адміністратора</h1>
 
-        <% if (typeof message !== 'undefined' && message) { %>
-            <div class="toast show"><%= message %></div>
-        <% } %>
-
         <div class="admin-tabs">
-            <button class="tab-link active" data-tab="data">Управління даними</button>
-            <button class="tab-link" data-tab="users">Управління користувачами</button>
-            <button class="tab-link" data-tab="backup">Резервне копіювання</button>
+            <button class="tab-link active" data-tab="users">Управління користувачами</button>
+            <button class="tab-link" data-tab="data">Управління даними</button>
+            <button class="tab-link" data-tab="status">Стан сервера</button>
         </div>
 
-        <div id="data" class="tab-content active">
+        <div id="users" class="tab-content active">
+            <h2>Список користувачів системи</h2>
+            <div class="filter-search-bar">
+                <input type="text" id="user-search-input" placeholder="Пошук за іменем або email...">
+            </div>
+            <div class="table-container" id="users-table-container"></div>
+        </div>
+        
+        <div id="data" class="tab-content">
             <h2>Управління даними системи</h2>
             <div class="data-management-panel">
-                <div class="data-tabs">
+                 <div class="data-tabs">
                     <button class="data-tab-link" data-table="sensors">Сенсори</button>
                     <button class="data-tab-link" data-table="readings">Показники</button>
                     <button class="data-tab-link" data-table="messages">Повідомлення</button>
                 </div>
                 <div class="data-content">
-<div id="sensors-content" class="data-table-content">
-    <div class="content-header">
-        <h3>Таблиця: sensors</h3>
-        <a href="/api/admin/export/sensors" class="export-btn">Експорт в CSV</a>
-    </div>
-
-    <div class="filter-search-bar">
-        <input type="text" id="sensor-search-input" placeholder="Пошук за назвою або описом...">
-        <select id="sensor-type-filter">
-            <option value="all">Всі типи</option>
-            <option value="air">Повітря</option>
-            <option value="water">Вода</option>
-            <option value="noise">Шум</option>
-        </select>
-    </div>
-
-    <div class="table-container" id="sensors-table-container"></div>
-</div>
+                    <div id="sensors-content" class="data-table-content">
+                        <div class="content-header">
+                            <h3>Таблиця: sensors</h3>
+                            <a href="/api/admin/export/sensors" class="export-btn">Експорт в CSV</a>
+                        </div>
+                        <div class="filter-search-bar">
+                            <input type="text" id="sensor-search-input" placeholder="Пошук...">
+                            <select id="sensor-type-filter">
+                                <option value="all">Всі типи</option>
+                                <option value="air">Повітря</option>
+                                <option value="water">Вода</option>
+                                <option value="noise">Шум</option>
+                            </select>
+                        </div>
                         <div class="table-container" id="sensors-table-container"></div>
                     </div>
                     <div id="readings-content" class="data-table-content" style="display: none;">
-                         <div class="content-header">
+                        <div class="content-header">
                             <h3>Таблиця: sensor_readings (останні 100)</h3>
                             <a href="/api/admin/export/sensor_readings" class="export-btn">Експорт в CSV</a>
                         </div>
                         <div class="table-container" id="readings-table-container"></div>
                     </div>
                      <div id="messages-content" class="data-table-content" style="display: none;">
-                         <div class="content-header">
+                        <div class="content-header">
                             <h3>Таблиця: messages</h3>
                             <a href="/api/admin/export/messages" class="export-btn">Експорт в CSV</a>
                         </div>
@@ -74,19 +73,7 @@
             </div>
         </div>
 
-        <div id="data" class="tab-content">
-            </div>
-
-        <div id="users" class="tab-content ">
-            <h2>Список користувачів системи</h2>
-            <div class="filter-search-bar">
-                <input type="text" id="user-search-input" placeholder="Пошук за іменем або email...">
-            </div>
-            <div class="table-container" id="users-table-container">
-                </div>
-        </div>
-
-<div id="status" class="tab-content">
+        <div id="status" class="tab-content">
             <h2>Стан сервера та статистика</h2>
             <div class="status-grid">
                 <div class="status-widget"><h4>Навантаження CPU</h4><p class="large-text"><span id="cpu-load">0</span>%</p></div>

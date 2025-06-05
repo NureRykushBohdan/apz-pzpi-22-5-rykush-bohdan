@@ -195,24 +195,25 @@ document.addEventListener('DOMContentLoaded', () => {
     const statusTab = document.getElementById('status');
     if (statusTab) {
         const socket = io();
-        const cpuLoadEl = document.getElementById('cpu-load');
-        const memUsageEl = document.getElementById('mem-usage');
-        const memInfoEl = document.getElementById('mem-info');
-        const osInfoEl = document.getElementById('os-info');
-        const dbUsersEl = document.getElementById('db-users');
-        const dbSensorsEl = document.getElementById('db-sensors');
-        const dbReadingsEl = document.getElementById('db-readings');
-        const dbMessagesEl = document.getElementById('db-messages');
-        
+        const elements = {
+            cpu: document.getElementById('cpu-load'),
+            memUsage: document.getElementById('mem-usage'),
+            memInfo: document.getElementById('mem-info'),
+            os: document.getElementById('os-info'),
+            dbUsers: document.getElementById('db-users'),
+            dbSensors: document.getElementById('db-sensors'),
+            dbReadings: document.getElementById('db-readings'),
+            dbMessages: document.getElementById('db-messages')
+        };
         socket.on('server-stats', (stats) => {
-            cpuLoadEl.textContent = stats.cpu;
-            memUsageEl.textContent = ((parseFloat(stats.memory.used) / parseFloat(stats.memory.total)) * 100).toFixed(1);
-            memInfoEl.textContent = `${stats.memory.used} GB / ${stats.memory.total} GB`;
-            osInfoEl.textContent = stats.os;
-            dbUsersEl.textContent = stats.db.users;
-            dbSensorsEl.textContent = stats.db.sensors;
-            dbReadingsEl.textContent = stats.db.readings;
-            dbMessagesEl.textContent = stats.db.messages;
+            elements.cpu.textContent = stats.cpu;
+            elements.memUsage.textContent = ((parseFloat(stats.memory.used) / parseFloat(stats.memory.total)) * 100).toFixed(1);
+            elements.memInfo.textContent = `${stats.memory.used} GB / ${stats.memory.total} GB`;
+            elements.os.textContent = stats.os;
+            elements.dbUsers.textContent = stats.db.users;
+            elements.dbSensors.textContent = stats.db.sensors;
+            elements.dbReadings.textContent = stats.db.readings;
+            elements.dbMessages.textContent = stats.db.messages;
         });
     }
     
