@@ -10,7 +10,7 @@ const multer = require("multer");
 const pgSession = require("connect-pg-simple")(session);
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 const multerS3 = require("multer-s3");
-
+const sharp = require("sharp"); 
 
 
 
@@ -412,7 +412,7 @@ app.post("/contact", async (req, res) => {
 // Налаштування S3 для DigitalOcean Spaces
 const s3 = new S3Client({
     region: "fra1", 
-    endpoint: process.env.DO_SPACES_ENDPOINT,
+    endpoint: process.env.DO_SPACES_ENDPOINT, // <-- Тут має бути регіональна адреса
     credentials: {
         accessKeyId: process.env.DO_SPACES_KEY,
         secretAccessKey: process.env.DO_SPACES_SECRET
@@ -421,33 +421,47 @@ const s3 = new S3Client({
 
 // Налаштування Multer для DigitalOcean Spaces
 const upload = multer({
-    storage: multerS3({
-        s3: s3,
-        bucket: "All buckets",
-        acl: "public-read",
-        key: (req, file, cb) => {
-            const uniqueFileName = `profiles/${req.session.user.id}-${Date.now()}.webp`;
-            cb(null, uniqueFileName);
-        }
-    }),
-    limits: { fileSize: 300000 }, // Обмеження на 0.3 MB
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 5 * 1024 * 1024 },
 });
 
-// 🔹 **Маршрут для оновлення фото профілю**
+// В файлі server.js
+
+// 🔹 **ОНОВЛЕНИЙ Маршрут для оновлення фото профілю**
 app.post("/upload-profile-pic", upload.single("profilePic"), async (req, res) => {
     if (!req.file) {
         req.session.message = "Файл не завантажено!";
         return res.redirect("/settings");
     }
-
-    const profilePicUrl = `https://nikkme.fra1.digitaloceanspaces.com/${req.file.key}`;
-
     try {
+        // Тепер req.file.buffer буде існувати, бо ми використовуємо memoryStorage
+        const processedImageBuffer = await sharp(req.file.buffer)
+            .resize({ width: 500, height: 500, fit: 'cover' })
+            .webp({ quality: 80 })
+            .toBuffer();
+
+        // ... подальше завантаження в S3 ...
+        const uniqueFileName = `profiles/${req.session.user.id}-${Date.now()}.webp`;
+        const uploadParams = {
+            Bucket: process.env.DO_SPACES_BUCKET,
+            Key: uniqueFileName,
+            Body: processedImageBuffer,
+            ACL: "public-read",
+            ContentType: "image/webp"
+        };
+        await s3.send(new PutObjectCommand(uploadParams));
+
+        // ... оновлення БД та редірект
+        const profilePicUrl = `https://${process.env.DO_SPACES_BUCKET}.${process.env.DO_SPACES_ENDPOINT.replace('https://', '')}/${uniqueFileName}`;
         await pool.query("UPDATE users SET profile_picture = $1 WHERE id = $2", [profilePicUrl, req.session.user.id]);
         req.session.user.profile_picture = profilePicUrl;
+        req.session.message = "Фото профілю успішно оновлено!";
         res.redirect("/settings");
+
     } catch (err) {
+        // ... обробка помилок ...
         console.error("Помилка при оновленні фото профілю:", err);
+        req.session.message = "Помилка при обробці зображення.";
         res.redirect("/settings");
     }
 });
@@ -590,6 +604,29 @@ app.post("/api/sensors", checkAdmin, async (req, res) => {
         client.release(); // Повертаємо клієнта до пулу
     }
 });
+
+
+app.get("/api/sensors/:id/history", async (req, res) => {
+    try {
+        const { id } = req.params;
+        const time_24_hours_ago = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+
+        const query = `
+            SELECT data_values, timestamp 
+            FROM sensor_readings 
+            WHERE sensor_id = $1 AND timestamp >= $2
+            ORDER BY timestamp ASC;
+        `;
+        
+        const { rows } = await pool.query(query, [id, time_24_hours_ago]);
+        res.json(rows);
+
+    } catch (err) {
+        console.error("Помилка отримання історії датчика:", err);
+        res.status(500).json({ error: "Помилка сервера" });
+    }
+});
+
 
 // Запуск сервера
 app.listen(port, () => {

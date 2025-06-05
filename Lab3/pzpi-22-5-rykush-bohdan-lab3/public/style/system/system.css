@@ -49,3 +49,73 @@
 /* Адаптивність */
 @media (max-width: 1200px) { .system-grid { grid-template-columns: repeat(2, 1fr); grid-template-areas: "welcome welcome" "nearest-sensor map-widget" "recommendations recommendations" "stats stats"; } }
 @media (max-width: 768px) { .system-grid { grid-template-columns: 1fr; grid-template-areas: "welcome" "nearest-sensor" "map-widget" "recommendations" "stats"; } }
+
+
+
+.history-widget, .leaderboard-widget {
+    grid-column: span 2; /* Розтягуємо віджет історії на 2 колонки */
+}
+
+.map-widget {
+    grid-column: span 1; /* Звужуємо віджет карти до 1 колонки */
+}
+
+.leaderboard-columns {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.leaderboard-column {
+    width: 50%;
+}
+
+.leaderboard-column h4 {
+    font-size: 16px;
+    margin-bottom: 10px;
+    color: #34495e;
+}
+
+.leaderboard-column ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.leaderboard-column li {
+    padding: 5px;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+}
+
+.leaderboard-column li span {
+    font-weight: bold;
+    color: #566573;
+}
+
+/* Оновлення адаптивності сітки */
+.system-grid {
+    grid-template-areas:
+        "welcome welcome welcome"
+        "nearest-sensor history history"
+        "map-widget leaderboard leaderboard"
+        "stats stats stats";
+}
+
+@media (max-width: 1200px) {
+    .system-grid {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "welcome"
+            "nearest-sensor"
+            "history"
+            "map-widget"
+            "leaderboard"
+            "stats";
+    }
+    .history-widget, .leaderboard-widget, .map-widget {
+        grid-column: span 1;
+    }
+}
