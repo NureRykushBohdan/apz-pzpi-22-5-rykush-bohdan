@@ -1,139 +1,51 @@
-.system-main {
-    padding: 20px;
-    padding-top: 94px; /* 74px (header) + 20px (padding) */
-    width: 100%;
-    box-sizing: border-box;
-}
-
-.system-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: auto;
-    gap: 20px;
-    max-width: 1400px;
-    margin: 0 auto;
-    grid-template-areas:
-        "welcome welcome welcome"
-        "nearest-sensor map-widget recommendations"
-        "stats stats stats";
-}
-
-.widget {
-    background: #ffffff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.widget:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
-}
-
-.widget h3 {
-    font-size: 20px;
-    color: #2c3e50;
-    margin-top: 0;
-    margin-bottom: 15px;
-    padding-bottom: 10px;
-    border-bottom: 2px solid #3498db;
-    display: inline-block;
-}
-
-/* Розміщення віджетів по сітці */
+.system-main { padding: 20px; padding-top: 94px; width: 100%; box-sizing: border-box; }
+.system-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 1400px; margin: 0 auto; grid-template-areas: "welcome welcome welcome" "nearest-sensor map-widget recommendations" "stats stats stats"; }
+.widget { background: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06); }
+.widget h3 { font-size: 20px; color: #2c3e50; margin-top: 0; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #3498db; display: inline-block; }
 .welcome-widget { grid-area: welcome; text-align: center; background: none; box-shadow: none; padding: 0 20px 20px; }
 .nearest-sensor-widget { grid-area: nearest-sensor; }
 .map-widget { grid-area: map-widget; }
 .recommendations-widget { grid-area: recommendations; }
 .stats-widget { grid-area: stats; }
-
-.welcome-widget h1 {
-    font-size: 32px;
-    color: #2c3e50;
-}
-.welcome-widget p {
-    font-size: 18px;
-    color: #566573;
-}
-
-/* Специфічні стилі віджетів */
-#mini-map {
-    height: 250px;
-    border-radius: 6px;
-    margin-bottom: 10px;
-}
-
-.map-link {
-    display: block;
-    text-align: right;
-    color: #3498db;
-    font-weight: 500;
-    text-decoration: none;
-    margin-top: 10px;
-}
-.map-link:hover {
-    text-decoration: underline;
-}
-
-#nearest-sensor-info p, #recommendations-info p, #recommendations-info li {
-    font-size: 16px;
-    line-height: 1.6;
-    color: #34495e;
-}
-#recommendations-info ul {
-    padding-left: 20px;
-    margin: 0;
-}
-
-/* Кольори для статусів */
+.welcome-widget h1 { font-size: 32px; color: #2c3e50; }
+.welcome-widget p { font-size: 18px; color: #566573; }
+#mini-map { height: 250px; border-radius: 6px; margin-bottom: 10px; }
+.map-link { display: block; text-align: right; color: #3498db; font-weight: 500; text-decoration: none; margin-top: 10px; }
+#nearest-sensor-info p, #recommendations-info p, #recommendations-info li { font-size: 16px; line-height: 1.6; color: #34495e; }
+#recommendations-info ul { padding-left: 20px; margin: 0; }
 .status-good, .status-добре { color: #28a745; font-weight: bold; }
 .status-moderate, .status-помірно { color: #fd7e14; font-weight: bold; }
 .status-poor, .status-погано { color: #dc3545; font-weight: bold; }
-.status-unknown { color: #6c757d; font-weight: bold; }
 
-/* Стилі для графіків */
-.charts-container {
+/* 🔥 ОНОВЛЕНІ СТИЛІ ДЛЯ ГРАФІКІВ */
+.chart-groups-container {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 20px;
-    width: 100%;
 }
-.charts-container div {
-    min-height: 250px;
-    position: relative;
+.chart-group {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 6px;
+    border: 1px solid #e9ecef;
 }
-.charts-container h4 {
+.chart-group h4 {
     text-align: center;
-    font-size: 16px;
+    font-size: 18px;
     color: #34495e;
-    margin-bottom: 10px;
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+.chart-item {
+    height: 220px; /* Фіксована висота для кожного маленького графіка */
+    position: relative;
+    width: 100%;
+    margin-bottom: 15px;
+}
+.chart-item:last-child {
+    margin-bottom: 0;
 }
 
 /* Адаптивність */
-@media (max-width: 1200px) {
-    .system-grid {
-        grid-template-columns: repeat(2, 1fr);
-        grid-template-areas:
-            "welcome welcome"
-            "nearest-sensor map-widget"
-            "recommendations recommendations"
-            "stats stats";
-    }
-    .charts-container {
-        grid-template-columns: 1fr;
-    }
-}
-
-@media (max-width: 768px) {
-    .system-grid {
-        grid-template-columns: 1fr;
-        grid-template-areas:
-            "welcome"
-            "nearest-sensor"
-            "map-widget"
-            "recommendations"
-            "stats";
-    }
-    .welcome-widget h1 { font-size: 26px; }
-}
+@media (max-width: 1200px) { .system-grid { grid-template-columns: repeat(2, 1fr); grid-template-areas: "welcome welcome" "nearest-sensor map-widget" "recommendations recommendations" "stats stats"; } }
+@media (max-width: 768px) { .system-grid { grid-template-columns: 1fr; grid-template-areas: "welcome" "nearest-sensor" "map-widget" "recommendations" "stats"; } }
