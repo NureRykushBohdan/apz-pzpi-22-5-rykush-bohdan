@@ -4,18 +4,243 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Контакти - EcoGuard</title>
-    <link rel="stylesheet" href="/style/system/system.css">
+    <link rel="stylesheet" href="/style/partials/footer_header.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Анімація для маркера на карті */
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.5; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+        .pulse {
+            border-radius: 50%;
+            border: 2px solid #3498db;
+            animation: pulse 1.5s infinite;
+        }
+    </style>
 </head>
 <body>
      <%- include('../partials/header') %>
 
+ <main class="system-main">
+        <div class="system-grid">
 
+            <div class="widget welcome-widget">
+                <h1>Вітаємо, <%= user.name %>!</h1>
+                <p>Ось поточний екологічний стан вашого регіону.</p>
+            </div>
+
+            <div class="widget nearest-sensor-widget">
+                <h3>Найближчий датчик</h3>
+                <div id="nearest-sensor-info">
+                    <p>Завантаження даних...</p>
+                </div>
+            </div>
+            
+            <div class="widget recommendations-widget">
+                <h3>Поради для вас</h3>
+                <div id="recommendations-info">
+                    <p>Аналізуємо дані...</p>
+                </div>
+            </div>
+
+            <div class="widget map-widget">
+                <h3>Карта датчиків</h3>
+                <div id="mini-map"></div>
+                <a href="/map" class="map-link">Перейти до повної карти →</a>
+            </div>
+
+            <div class="widget stats-widget">
+                <h3>Загальна статистика</h3>
+                <div class="charts-container">
+                    <div>
+                        <h4>Якість повітря (останні дані)</h4>
+                        <canvas id="airChart"></canvas>
+                    </div>
+                    <div>
+                        <h4>Якість води (останні дані)</h4>
+                        <canvas id="waterChart"></canvas>
+                    </div>
+                    <div>
+                        <h4>Рівень шуму (останні дані)</h4>
+                        <canvas id="noiseChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
 
       <%- include('../partials/footer') %>
 
     <script src="/js/system/system.js" defer></script>
     <script src="/partials/footer.js" defer></script>
+      <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const nearestSensorInfo = document.getElementById('nearest-sensor-info');
+            const recommendationsInfo = document.getElementById('recommendations-info');
+            const miniMapElement = document.getElementById('mini-map');
+            
+          
+            let allSensors = [];
+            let map;
+            let charts = {};
+
+            const createIcon = (color) => new L.Icon({
+                iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${color}.png`,
+                shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
+            });
+            const greenIcon = createIcon('green'), yellowIcon = createIcon('gold'), redIcon = createIcon('red'), greyIcon = createIcon('grey');
+            
+            const getIconByStatus = (status) => {
+                const s = status ? status.toLowerCase() : 'unknown';
+                if (s === 'good' || s === 'добре') return greenIcon;
+                if (s === 'moderate' || s === 'помірно') return yellowIcon;
+                if (s === 'poor' || s === 'погано') return redIcon;
+                return greyIcon;
+            };
+
+            function getDistance(lat1, lon1, lat2, lon2) {
+                const R = 6371; const dLat = (lat2 - lat1) * Math.PI / 180; const dLon = (lon2 - lon1) * Math.PI / 180;
+                const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)); return R * c;
+            }
+
+            function getRecommendations(sensor) {
+                if (!sensor || !sensor.status) return "<p>Недостатньо даних для надання рекомендацій.</p>";
+                let advice = "<ul>";
+                const status = sensor.status.toLowerCase();
+                switch (sensor.sensor_type.toLowerCase()) {
+                    case 'air':
+                        if (status === 'good' || status === 'добре') advice += "<li>Якість повітря відмінна. Ідеальний час для прогулянок!</li>";
+                        else if (status === 'moderate' || status === 'помірно') advice += "<li>Якість повітря посередня. Чутливим групам варто обмежити тривале перебування на вулиці.</li>";
+                        else if (status === 'poor' || status === 'погано') advice += "<li>Погана якість повітря. Рекомендується залишатися в приміщенні.</li>";
+                        break;
+                    case 'water':
+                         if (status === 'good' || status === 'добре') advice += "<li>Якість води в нормі.</li>";
+                        else if (status === 'moderate' || status === 'помірно') advice += "<li>Якість води задовільна, але краще утриматися від купання.</li>";
+                        else if (status === 'poor' || status === 'погано') advice += "<li>Погана якість води. Уникайте контакту з водою.</li>";
+                        break;
+                    case 'noise':
+                         if (status === 'good' || status === 'добре') advice += "<li>Рівень шуму низький. Сприятливі умови для відпочинку.</li>";
+                        else if (status === 'moderate' || status === 'помірно') advice += "<li>Підвищений рівень шуму. Може викликати дискомфорт.</li>";
+                        else if (status === 'poor' || status === 'погано') advice += "<li>Високий рівень шуму. Рекомендується використовувати засоби захисту слуху.</li>";
+                        break;
+                }
+                advice += "</ul>"; return advice;
+            }
+            
+            function processDataForLocation(latitude, longitude) {
+                let nearestSensor = null;
+                let minDistance = Infinity;
+                allSensors.forEach(sensor => {
+                    const distance = getDistance(latitude, longitude, sensor.latitude, sensor.longitude);
+                    if (distance < minDistance) {
+                        minDistance = distance;
+                        nearestSensor = sensor;
+                    }
+                });
+                if (nearestSensor) {
+                    updateUI(nearestSensor);
+                } else {
+                    nearestSensorInfo.innerHTML = '<p>Не вдалося знайти найближчий датчик.</p>';
+                }
+            }
+
+            async function saveLocation(latitude, longitude) {
+                try {
+                    await fetch('/api/update-location', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ latitude, longitude })
+                    });
+                } catch (error) {
+                    console.error("Не вдалося автоматично зберегти місцезнаходження:", error);
+                }
+            }
+
+            function updateUI(nearest) {
+                let sensorHtml = `<h4>${nearest.sensor_name}</h4><p><strong>Тип:</strong> ${nearest.sensor_type}</p><p><strong>Статус:</strong> <span class="status-${(nearest.status || 'unknown').toLowerCase()}">${nearest.status || 'Невідомо'}</span></p>`;
+                if (nearest.data_values) for (const [key, value] of Object.entries(nearest.data_values)) sensorHtml += `<p><strong>${key.charAt(0).toUpperCase() + key.slice(1)}:</strong> ${value}</p>`;
+                sensorHtml += `<p><small>Оновлено: ${new Date(nearest.last_updated).toLocaleString('uk-UA')}</small></p>`;
+                nearestSensorInfo.innerHTML = sensorHtml;
+                recommendationsInfo.innerHTML = getRecommendations(nearest);
+                if (!map) {
+                    map = L.map(miniMapElement).setView([nearest.latitude, nearest.longitude], 13);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+                    allSensors.forEach(s => L.marker([s.latitude, s.longitude], { icon: getIconByStatus(s.status) }).addTo(map).bindPopup(`<b>${s.sensor_name}</b>`));
+                    const pulseIcon = L.divIcon({className: 'pulse', iconSize: [20, 20]});
+                    L.marker([nearest.latitude, nearest.longitude], {icon: pulseIcon}).addTo(map);
+                } else {
+                    map.setView([nearest.latitude, nearest.longitude], 13);
+                }
+            }
+            
+            function updateCharts(sensors) {
+                const airSensors = sensors.filter(s => s.sensor_type.toLowerCase() === 'air');
+                const waterSensors = sensors.filter(s => s.sensor_type.toLowerCase() === 'water');
+                const noiseSensors = sensors.filter(s => s.sensor_type.toLowerCase() === 'noise');
+
+                const createChart = (ctx, label, labels, datasets) => {
+                    if (charts[ctx.canvas.id]) charts[ctx.canvas.id].destroy();
+                    charts[ctx.canvas.id] = new Chart(ctx, {
+                        type: 'bar',
+                        data: { labels, datasets },
+                        options: { responsive: true, maintainAspectRatio: false }
+                    });
+                };
+                
+                if (airSensors.length > 0) createChart(document.getElementById('airChart').getContext('2d'), 'Якість Повітря', airSensors.map(s => s.sensor_name), [
+                    { label: 'CO₂', data: airSensors.map(s => s.data_values?.co2 || 0), backgroundColor: 'rgba(255, 99, 132, 0.5)' },
+                    { label: 'PM2.5', data: airSensors.map(s => s.data_values?.pm25 || 0), backgroundColor: 'rgba(54, 162, 235, 0.5)' }
+                ]);
+
+                if (waterSensors.length > 0) createChart(document.getElementById('waterChart').getContext('2d'),'Якість Води',waterSensors.map(s => s.sensor_name), [
+                    { label: 'Температура (°C)', data: waterSensors.map(s => s.data_values?.temperature || 0), backgroundColor: 'rgba(75, 192, 192, 0.5)' },
+                    { label: 'Кислотність (pH)', data: waterSensors.map(s => s.data_values?.acidity || 0), backgroundColor: 'rgba(153, 102, 255, 0.5)' }
+                ]);
+
+                if (noiseSensors.length > 0) createChart(document.getElementById('noiseChart').getContext('2d'),'Рівень шуму (dB)',noiseSensors.map(s => s.sensor_name), [
+                    { label: 'Шум (dB)', data: noiseSensors.map(s => s.data_values?.level || 0), backgroundColor: 'rgba(255, 159, 64, 0.5)' }
+                ]);
+            }
+
+            try {
+                const response = await fetch('/api/sensors-with-latest-readings');
+                allSensors = await response.json();
+                if (!allSensors || allSensors.length === 0) {
+                    nearestSensorInfo.innerHTML = '<p>Активні датчики відсутні.</p>';
+                    return;
+                }
+                updateCharts(allSensors);
+
+                if (user.latitude && user.longitude) {
+                    nearestSensorInfo.innerHTML = '<p>Використовуємо збережене місцезнаходження...</p>';
+                    processDataForLocation(user.latitude, user.longitude);
+                } else {
+                    nearestSensorInfo.innerHTML = '<p>Визначаємо ваше місцезнаходження вперше...</p>';
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            const { latitude, longitude } = position.coords;
+                            processDataForLocation(latitude, longitude);
+                            saveLocation(latitude, longitude);
+                        },
+                        (error) => {
+                            console.error("Помилка геолокації:", error);
+                            nearestSensorInfo.innerHTML = '<p>Не вдалося визначити локацію. Показуємо дані для першого доступного датчика.</p>';
+                            updateUI(allSensors[0]);
+                        }
+                    );
+                }
+            } catch (error) {
+                console.error("Помилка завантаження даних:", error);
+                nearestSensorInfo.innerHTML = '<p>Помилка завантаження даних з сервера.</p>';
+            }
+        });
+    </script>
 </body>
 </html>

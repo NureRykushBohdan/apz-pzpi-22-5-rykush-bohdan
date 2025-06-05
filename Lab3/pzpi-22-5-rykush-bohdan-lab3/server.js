@@ -291,10 +291,13 @@ app.get("/confirm-email", async (req, res) => {
 });
 
 
+// В файле server.js
+
 app.post("/login", async (req, res) => {
-    const { email, password, redirect } = req.body; // Додаємо поле redirect
+    const { email, password, redirect } = req.body;
 
     try {
+        // Запит тепер включає нові поля
         const user = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
 
         if (user.rows.length === 0) {
@@ -304,7 +307,6 @@ app.post("/login", async (req, res) => {
 
         const userData = user.rows[0];
 
-        // Перевірка підтвердження email
         if (!userData.is_verified) {
             req.session.message = "Будь ласка, підтвердьте email перед входом!";
             return res.redirect("/login");
@@ -316,22 +318,22 @@ app.post("/login", async (req, res) => {
             return res.redirect("/login");
         }
 
-        // Збереження даних користувача в сесії
+        // 🔥 **ОНОВЛЕНО: Додаємо координати в сесію**
         req.session.user = { 
             id: userData.id, 
             name: userData.name, 
             email: userData.email, 
-            role: userData.role 
+            role: userData.role,
+            latitude: userData.latitude,     // Додано
+            longitude: userData.longitude   // Додано
         };
 
-        // Збереження в cookies
         res.cookie("user", JSON.stringify(req.session.user), { 
             maxAge: 7 * 24 * 60 * 60 * 1000, 
             httpOnly: true 
         });
 
-        // Використовуємо redirect, якщо він є, інакше йдемо на головну сторінку
-        const targetPage = redirect && redirect !== "undefined" ? redirect : "/";
+        const targetPage = redirect && redirect !== "undefined" ? redirect : "/system"; // Перенаправляємо на /system
         res.redirect(targetPage);
     } catch (err) {
         console.error("Помилка входу:", err);
@@ -340,7 +342,37 @@ app.post("/login", async (req, res) => {
     }
 });
 
+app.post("/api/update-location", async (req, res) => {
+    // Перевіряємо, чи користувач авторизований
+    if (!req.session.user) {
+        return res.status(401).json({ success: false, message: "Не авторизовано" });
+    }
 
+    const { latitude, longitude } = req.body;
+    const userId = req.session.user.id;
+
+    // Проста валідація
+    if (latitude == null || longitude == null) {
+        return res.status(400).json({ success: false, message: "Невірні координати" });
+    }
+
+    try {
+        await pool.query(
+            "UPDATE users SET latitude = $1, longitude = $2 WHERE id = $3",
+            [latitude, longitude, userId]
+        );
+
+        // Оновлюємо дані в сесії
+        req.session.user.latitude = latitude;
+        req.session.user.longitude = longitude;
+
+        res.json({ success: true, message: "Місцезнаходження оновлено!" });
+
+    } catch (err) {
+        console.error("Помилка оновлення місцезнаходження:", err);
+        res.status(500).json({ success: false, message: "Помилка сервера" });
+    }
+});
 
 
 

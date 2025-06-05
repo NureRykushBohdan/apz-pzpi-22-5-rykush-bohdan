@@ -1,209 +1,139 @@
-/* Глобальні стилі */
-html, body {
+.system-main {
+    padding: 20px;
+    padding-top: 94px; /* 74px (header) + 20px (padding) */
     width: 100%;
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    overflow-x: hidden; 
-    display: flex;
-    flex-direction: column;
-    font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Сучасний, чистий шрифт */
-    background-color: #eef2f5; /* Дуже світлий, майже білий фон, технологічний */
-    color: #333a45; /* Темно-сірий для основного тексту */
-}
-
-header {
-    display: flex;
-    justify-content: space-between; /* Розміщення лого зліва, навігації та кнопок справа */
-    align-items: center;
-    padding: 15px 40px; /* Оптимізований паддінг */
-    width: 100%;
-    top: 0;
-    left: 0;
-    z-index: 1000;
-    transition: box-shadow 0.3s ease, background-color 0.3s ease;
-    position: fixed;
-    background: #ffffff;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Легка початкова тінь */
     box-sizing: border-box;
 }
 
-header.scrolled {
-    box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.08); /* Більш виражена тінь при скролі */
+.system-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: auto;
+    gap: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+    grid-template-areas:
+        "welcome welcome welcome"
+        "nearest-sensor map-widget recommendations"
+        "stats stats stats";
 }
 
-/* Логотип */
-.logo a {
-    display: flex;
-    align-items: center;
-    font-size: 28px; /* Зменшено для більш витонченого вигляду */
-    font-weight: 700; /* Більш жирний для акценту */
-    color: #2c3e50; /* Темний, насичений синьо-сірий */
-    text-decoration: none;
-    transition: color 0.3s ease;
-}
-.logo a:hover {
-    color: #1a252f;
+.widget {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.logo img {
-    height: 32px; /* Відповідно до розміру шрифту */
-    margin-right: 10px;
+.widget:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
 }
 
-/* Навігація та кнопки авторизації разом */
-.header-right-content {
-    display: flex;
-    align-items: center;
-    gap: 25px;
-}
-
-/* Стилі для навігації */
-nav {
-    display: flex;
-    gap: 25px;
-}
-
-nav a {
-    color: #34495e; /* Спокійний синьо-сірий */
-    text-decoration: none;
-    font-size: 17px; /* Оптимальний розмір для навігації */
-    font-weight: 500;
-    transition: color 0.3s ease;
-    padding: 5px 0;
-    position: relative; /* Для анімації підкреслення */
-}
-
-nav a::after { /* Ефект підкреслення при ховері */
-    content: '';
-    position: absolute;
-    width: 0;
-    height: 2px;
-    bottom: -2px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #3498db; /* Яскравий синій акцент */
-    transition: width 0.3s ease;
-}
-
-nav a:hover::after, nav a.active::after {
-    width: 100%;
-}
-nav a:hover, nav a.active {
-    color: #3498db; /* Яскравий синій при ховері/активності */
-}
-
-
-/* Кнопки авторизації */
-.auth-buttons {
-    display: flex;
-    gap: 15px;
-    align-items: center;
-}
-
-.login-btn {
-    color: #3498db;
-    font-size: 17px;
-    text-decoration: none;
-    font-weight: 500;
-    transition: color 0.3s ease;
-    padding: 8px 15px;
-    border: 1px solid transparent; /* Для збереження розміру */
-    border-radius: 5px;
-}
-
-.login-btn:hover {
-    color: #2980b9;
-    background-color: #ecf0f1; /* Дуже світлий фон при ховері */
-}
-
-.signup-btn {
-    background: #3498db;
-    color: white;
-    padding: 8px 20px;
-    border-radius: 5px; /* Гостріші кути */
-    font-weight: 500;
-    text-decoration: none;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    font-size: 17px;
-    border: 1px solid #3498db;
-}
-
-.signup-btn:hover {
-    background: #2980b9;
-    border-color: #2980b9;
-    transform: translateY(-1px);
-}
-
-.user-menu {
-    position: relative;
+.widget h3 {
+    font-size: 20px;
+    color: #2c3e50;
+    margin-top: 0;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #3498db;
     display: inline-block;
 }
 
-#user-name {
-    background: none;
-    border: none;
-    font-size: 17px;
-    cursor: pointer;
-    padding: 8px 10px;
+/* Розміщення віджетів по сітці */
+.welcome-widget { grid-area: welcome; text-align: center; background: none; box-shadow: none; padding: 0 20px 20px; }
+.nearest-sensor-widget { grid-area: nearest-sensor; }
+.map-widget { grid-area: map-widget; }
+.recommendations-widget { grid-area: recommendations; }
+.stats-widget { grid-area: stats; }
+
+.welcome-widget h1 {
+    font-size: 32px;
     color: #2c3e50;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    gap: 5px;
 }
-#user-name:hover {
-    color: #3498db;
+.welcome-widget p {
+    font-size: 18px;
+    color: #566573;
 }
 
-.dropdown-menu {
-    display: none;
-    position: absolute;
-    top: calc(100% + 8px);
-    right: 0;
-    background: white;
-    border: 1px solid #e0e0e0;
-    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.08);
-    padding: 8px 0;
-    border-radius: 5px;
-    min-width: 180px;
-    z-index: 10;
+/* Специфічні стилі віджетів */
+#mini-map {
+    height: 250px;
+    border-radius: 6px;
+    margin-bottom: 10px;
 }
 
-.dropdown-menu a {
-    text-decoration: none;
-    color: #333a45;
+.map-link {
     display: block;
-    padding: 10px 18px;
-    font-size: 15px;
-    transition: background-color 0.2s ease, color 0.2s ease;
-}
-
-.dropdown-menu a:hover {
-    background: #f5f7f9;
+    text-align: right;
     color: #3498db;
-}
-
-
-footer {
-    width: 100%;
-    background: #2c3e50; /* Темний синьо-сірий */
-    color: #bdc3c7; /* Світло-сірий текст */
-    text-align: center;
-    padding: 30px 20px;
-    font-size: 15px;
-    margin-top: auto;
-    line-height: 1.6;
-}
-footer p {
-    margin: 5px 0;
-}
-footer a {
-    color: #5dade2; /* Світліший синій для посилань */
+    font-weight: 500;
     text-decoration: none;
-    transition: color 0.2s ease;
+    margin-top: 10px;
 }
-footer a:hover {
-    color: #85c1e9;
+.map-link:hover {
     text-decoration: underline;
+}
+
+#nearest-sensor-info p, #recommendations-info p, #recommendations-info li {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #34495e;
+}
+#recommendations-info ul {
+    padding-left: 20px;
+    margin: 0;
+}
+
+/* Кольори для статусів */
+.status-good, .status-добре { color: #28a745; font-weight: bold; }
+.status-moderate, .status-помірно { color: #fd7e14; font-weight: bold; }
+.status-poor, .status-погано { color: #dc3545; font-weight: bold; }
+.status-unknown { color: #6c757d; font-weight: bold; }
+
+/* Стилі для графіків */
+.charts-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    width: 100%;
+}
+.charts-container div {
+    min-height: 250px;
+    position: relative;
+}
+.charts-container h4 {
+    text-align: center;
+    font-size: 16px;
+    color: #34495e;
+    margin-bottom: 10px;
+}
+
+/* Адаптивність */
+@media (max-width: 1200px) {
+    .system-grid {
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-areas:
+            "welcome welcome"
+            "nearest-sensor map-widget"
+            "recommendations recommendations"
+            "stats stats";
+    }
+    .charts-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .system-grid {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "welcome"
+            "nearest-sensor"
+            "map-widget"
+            "recommendations"
+            "stats";
+    }
+    .welcome-widget h1 { font-size: 26px; }
 }
