@@ -25,38 +25,7 @@
 </head>
 <body>
 
-    <header id="main-header">
-        <div class="logo">
-             <a href="/"> EcoGuard</a>
-        </div>
-        <div class="header-right-content">
-            <nav>
-                <a href="/">Головна</a>
-                <a href="/map" class="active">Карта Даних</a>
-                <a href="/about-system">Про Систему</a>
-                <a href="/contact">Контакти</a>
-            </nav>
-            <% if (typeof user !== 'undefined' && user) { %>
-                <div class="user-menu">
-                    <button id="user-name"><%= user.name %> &#9662;</button>
-                    <div class="dropdown-menu" id="dropdown-menu">
-                        <a href="/dashboard">Панель приладів</a>
-                        <a href="/profile">Мій профіль</a>
-                        <a href="/settings">Налаштування</a>
-                        <% if (user.role === "admin") { %>
-                            <a href="/admin-panel">Панель Адміністратора</a>
-                        <% } %>
-                        <a href="/logout">Вийти</a>
-                    </div>
-                </div>
-            <% } else { %>
-                <div class="auth-buttons">
-                    <a href="/login" class="login-btn">Увійти</a>
-                    <a href="/register" class="signup-btn">Реєстрація</a>
-                </div>
-            <% } %>
-        </div>
-    </header>
+        <%- include('../partials/header') %>
     
     <main class="map-page-main">
         <aside class="map-sidebar">
@@ -100,34 +69,12 @@
     </main>
 
 
-    <footer>
-        <p>© <%= new Date().getFullYear() %> EcoGuard. Програмна система моніторингу екологічного стану місцевості.</p>
-        <p><a href="/privacy-policy">Політика конфіденційності</a> | <a href="/terms-of-use">Умови використання</a></p>
-    </footer>
-
+      <%- include('../partials/footer') %>
  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     
     <script src="/js/front/map.js" defer></script>
+<script src="/js/partials/footer.js" defer></script>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const userNameButton = document.getElementById("user-name");
-            const dropdownMenu = document.getElementById("dropdown-menu");
-
-            if (userNameButton) {
-                userNameButton.addEventListener("click", function (event) {
-                    event.stopPropagation();
-                    dropdownMenu.style.display = dropdownMenu.style.display === "block" ? "none" : "block";
-                });
-
-                document.addEventListener("click", function (event) {
-                    if (dropdownMenu && !dropdownMenu.contains(event.target) && !userNameButton.contains(event.target)) {
-                        dropdownMenu.style.display = "none";
-                    }
-                });
-            }
-        });
-    </script>
  
 </body>
 </html>

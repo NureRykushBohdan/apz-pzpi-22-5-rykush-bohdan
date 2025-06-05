@@ -9,46 +9,7 @@
     <link rel="icon" href="https://placehold.co/32x32/3498db/ffffff?text=EG" type="image/x-icon">
 </head>
 <body>
-    <div id="preloader">
-        <div class="loader"></div>
-    </div>
-      <header id="main-header">
-        <div class="logo">
-            <a href="/"> EcoGuard</a>
-        </div>
-        <div class="header-right-content">
-            <nav>
-            <% if (user) { %>
-            <a href="/system" >Система</a>
-
-            <% } %>
-                <a href="/" class="active">Головна</a>
-                <a href="/map">Карта Даних</a>
-                <a href="/about-system">Про Систему</a>
-                <a href="/contact">Контакти</a>
-            </nav>
-            <% if (user) { %>
-                
-                <div class="user-menu">
-                    <button id="user-name"><%= user.name %> &#9662;</button>
-                    <div class="dropdown-menu" id="dropdown-menu">
-                        <a href="/dashboard">Панель приладів</a>
-                        <a href="/profile">Мій профіль</a>
-                        <a href="/settings">Налаштування</a>
-                        <% if (user.role === "admin") { %>
-                            <a href="/admin-panel">Панель Адміністратора</a>
-                        <% } %>
-                        <a href="/logout">Вийти</a>
-                    </div>
-                </div>
-            <% } else { %>
-                <div class="auth-buttons">
-                    <a href="/login" class="login-btn">Увійти</a>
-                    <a href="/register" class="signup-btn">Реєстрація</a>
-                </div>
-            <% } %>
-        </div>
-    </header>
+<%- include('../partials/header') %>
 
     <main class="page-main-content">
         <section class="hero-section-about">
@@ -117,43 +78,11 @@
         </section>
     </main>
 
-    <footer>
-        <p>© <%= new Date().getFullYear() %> EcoGuard. Програмна система моніторингу екологічного стану місцевості.</p>
-        <p><a href="/privacy-policy">Політика конфіденційності</a> | <a href="/terms-of-use">Умови використання</a></p>
-    </footer>
+ <%- include('../partials/footer') %>
 
 
     <script src="/js/front/about-system.js" defer></script>
- <script>
-        // Скрипт для підсвічування активного посилання в навігації
-        document.addEventListener("DOMContentLoaded", function() {
-            const navLinks = document.querySelectorAll('header nav a');
-            const currentPath = window.location.pathname;
+<script src="/js/partials/footer.js" defer></script>
 
-            navLinks.forEach(link => {
-                link.classList.remove('active');
-                if (link.getAttribute('href') === currentPath) {
-                    link.classList.add('active');
-                }
-            });
-
-            // Логіка для user-menu (якщо не винесена в глобальний script.js)
-            const userNameButton = document.getElementById("user-name");
-            const dropdownMenu = document.getElementById("dropdown-menu");
-
-            if (userNameButton) {
-                userNameButton.addEventListener("click", function (event) {
-                    event.stopPropagation();
-                    dropdownMenu.style.display = dropdownMenu.style.display === "block" ? "none" : "block";
-                });
-
-                document.addEventListener("click", function (event) {
-                    if (dropdownMenu && dropdownMenu.style.display === "block" && !userNameButton.contains(event.target) && !dropdownMenu.contains(event.target)) {
-                        dropdownMenu.style.display = "none";
-                    }
-                });
-            }
-        });
-    </script>
 </body>
 </html>
