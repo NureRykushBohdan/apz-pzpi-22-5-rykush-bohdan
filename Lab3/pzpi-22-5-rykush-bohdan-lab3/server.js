@@ -87,12 +87,7 @@ app.get("/", (req, res) => {
     }
     res.render("front/index", { title: "Головна сторінка", user: req.session.user });
 });
-app.get("/admin-panel", (req, res) => {
-    if (!req.session.user && req.cookies.user) {
-        req.session.user = JSON.parse(req.cookies.user);
-    }
-    res.render("system/admin-panel", { title: "Адмін панель", user: req.session.user });
-});
+
 app.get("/login", (req, res) => {
     const redirectUrl = req.query.redirect || "/";
     res.render("front/login", { message: req.session.message || "", redirect: redirectUrl });
@@ -632,7 +627,55 @@ app.get("/api/sensors/:id/history", async (req, res) => {
     }
 });
 
+// Маршрут для відображення самої сторінки адмін-панелі
+app.get('/admin', checkAdmin, async (req, res) => {
+    try {
+        // Отримуємо всіх користувачів з бази даних, крім поточного адміна
+        const result = await pool.query('SELECT id, name, email, role, is_verified FROM users WHERE id != $1 ORDER BY id ASC', [req.session.user.id]);
+        const users = result.rows;
+        
+        res.render('system/admin', {
+            title: 'Панель адміністратора',
+            user: req.session.user,
+            users: users, // Передаємо список користувачів у шаблон
+            message: req.session.message
+        });
+        req.session.message = null; // Очищуємо повідомлення
+    } catch (err) {
+        console.error("Помилка завантаження адмін-панелі:", err);
+        res.status(500).send("Помилка сервера");
+    }
+});
 
+// API: Оновлення ролі користувача
+app.post('/api/admin/users/:id/update-role', checkAdmin, async (req, res) => {
+    const { id } = req.params;
+    const { newRole } = req.body;
+
+    if (!['admin', 'user'].includes(newRole)) {
+        return res.status(400).json({ success: false, message: 'Невірна роль' });
+    }
+
+    try {
+        await pool.query('UPDATE users SET role = $1 WHERE id = $2', [newRole, id]);
+        res.json({ success: true, message: 'Роль оновлено' });
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'Помилка сервера' });
+    }
+});
+
+// API: Видалення користувача
+app.delete('/api/admin/users/:id', checkAdmin, async (req, res) => {
+    try {
+        const { id } = req.params;
+        // Потрібно бути обережним з видаленням, можливо, краще деактивувати
+        // Але для прикладу реалізуємо видалення
+        await pool.query('DELETE FROM users WHERE id = $1', [id]);
+        res.json({ success: true, message: 'Користувача видалено' });
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'Помилка сервера' });
+    }
+});
 // Запуск сервера
 app.listen(port, () => {
     console.log(`Сервер запущено на http://localhost:${port}`);

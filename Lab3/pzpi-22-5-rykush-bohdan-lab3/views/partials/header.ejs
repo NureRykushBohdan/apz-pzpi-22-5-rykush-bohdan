@@ -18,14 +18,17 @@
                 <div class="user-menu">
                     <button id="user-name"><%= user.name %> &#9662;</button>
                     <div class="dropdown-menu" id="dropdown-menu">
-                        <a href="/dashboard">Панель приладів</a>
-                        <a href="/profile">Мій профіль</a>
-                        <a href="/settings">Налаштування</a>
-                        <% if (user.role === "admin") { %>
-                            <a href="/admin-panel">Панель Адміністратора</a>
-                        <% } %>
-                        <a href="/logout">Вийти</a>
-                    </div>
+    <a href="/profile">Профіль</a>
+    <a href="/settings">Налаштування</a>
+
+    <% if (user && user.role === 'admin') { %>
+        <hr>
+        <a href="/admin">Адмін-панель</a>
+    <% } %>
+
+    <hr>
+    <a href="/logout">Вийти</a>
+</div>
                 </div>
             <% } else { %>
                 <div class="auth-buttons">

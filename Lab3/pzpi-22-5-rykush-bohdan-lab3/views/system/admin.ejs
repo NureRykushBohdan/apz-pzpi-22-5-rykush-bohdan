@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Контакти - EcoGuard</title>
+
+    <link rel="stylesheet" href="/style/system/admin.css"> 
+     <link rel="stylesheet" href="/style/partials/footer_header.css">
+    <link rel="icon" href="https://placehold.co/32x32/3498db/ffffff?text=EG" type="image/x-icon">
+</head>
+<body>
+
+  <%- include('../partials/header') %>
+<main class="admin-main">
+        <h1>Панель адміністратора</h1>
+
+        <% if (message) { %>
+            <div class="toast show"><%= message %></div>
+        <% } %>
+
+        <div class="admin-tabs">
+            <button class="tab-link active" data-tab="users">Управління користувачами</button>
+            <button class="tab-link" data-tab="data">Управління даними</button>
+            <button class="tab-link" data-tab="backup">Резервне копіювання</button>
+        </div>
+
+        <div id="users" class="tab-content active">
+            <h2>Список користувачів системи</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Ім'я</th>
+                            <th>Email</th>
+                            <th>Роль</th>
+                            <th>Верифікований</th>
+                            <th>Дії</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% users.forEach(u => { %>
+                            <tr data-user-id="<%= u.id %>">
+                                <td><%= u.id %></td>
+                                <td><%= u.name %></td>
+                                <td><%= u.email %></td>
+                                <td>
+                                    <select class="role-select" data-user-id="<%= u.id %>">
+                                        <option value="user" <%= u.role === 'user' ? 'selected' : '' %>>User</option>
+                                        <option value="admin" <%= u.role === 'admin' ? 'selected' : '' %>>Admin</option>
+                                    </select>
+                                </td>
+                                <td><%= u.is_verified ? 'Так' : 'Ні' %></td>
+                                <td>
+                                    <button class="delete-btn" data-user-id="<%= u.id %>">Видалити</button>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="data" class="tab-content">
+            <h2>Управління даними системи</h2>
+            <p>Цей розділ у розробці. Тут можна буде керувати датчиками, очищувати старі показники тощо.</p>
+        </div>
+
+        <div id="backup" class="tab-content">
+            <h2>Резервне копіювання та відновлення</h2>
+            <p>Цей розділ у розробці. Тут будуть функції для експорту та імпорту даних і налаштувань.</p>
+        </div>
+    </main>
+
+ <%- include('../partials/footer') %>
+
+
+    <script src="/js/system/admin.js" defer></script>
+<script src="/js/partials/footer.js" defer></script>
+</body>
+</html>

@@ -12,44 +12,8 @@
     <div id="success-toast" class="toast"><%= message %></div>
 <% } %>
 
-<header id="main-header">
-        <div class="logo">
-            <a href="/"> EcoGuard</a>
-        </div>
-        <div class="header-right-content">
-            <nav>
-            <% if (user) { %>
-            <a href="/system" >Система</a>
 
-            <% } %>
-                <a href="/" class="active">Головна</a>
-                <a href="/map">Карта Даних</a>
-                <a href="/about-system">Про Систему</a>
-                <a href="/contact">Контакти</a>
-            </nav>
-            <% if (user) { %>
-                
-                <div class="user-menu">
-                    <button id="user-name"><%= user.name %> &#9662;</button>
-                    <div class="dropdown-menu" id="dropdown-menu">
-                        <a href="/dashboard">Панель приладів</a>
-                        <a href="/profile">Мій профіль</a>
-                        <a href="/settings">Налаштування</a>
-                        <% if (user.role === "admin") { %>
-                            <a href="/admin-panel">Панель Адміністратора</a>
-                        <% } %>
-                        <a href="/logout">Вийти</a>
-                    </div>
-                </div>
-            <% } else { %>
-                <div class="auth-buttons">
-                    <a href="/login" class="login-btn">Увійти</a>
-                    <a href="/register" class="signup-btn">Реєстрація</a>
-                </div>
-            <% } %>
-        </div>
-    </header>
-
+  <%- include('../partials/header') %>
 
 <div class="settings-container">
     <h2>Налаштування профілю</h2>
@@ -98,11 +62,9 @@
 </div>
 
 
-    <footer>
-        <p>© <%= new Date().getFullYear() %> EcoGuard. Програмна система моніторингу екологічного стану місцевості.</p>
-        <p><a href="/privacy-policy">Політика конфіденційності</a> | <a href="/terms-of-use">Умови використання</a></p>
-    </footer>
+ <%- include('../partials/footer') %>
 
 <script src="/js/users/settings.js" defer></script>
+<script src="/js/partials/footer.js" defer></script>
 </body>
 </html>
