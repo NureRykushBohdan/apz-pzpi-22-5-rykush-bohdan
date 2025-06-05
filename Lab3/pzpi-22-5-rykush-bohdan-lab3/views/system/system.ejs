@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Контакти - EcoGuard</title>
     <link rel="stylesheet" href="/style/partials/footer_header.css">
+    <link rel="stylesheet" href="/style/system/system.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -113,74 +114,78 @@
     async function saveLocation(latitude, longitude) { try { await fetch('/api/update-location', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ latitude, longitude }) }); } catch (error) { console.error("Не вдалося автоматично зберегти місцезнаходження:", error); } }
 
     // 🔥 **ОНОВЛЕНА ФУНКЦІЯ ДЛЯ СТВОРЕННЯ ГРАФІКІВ**
-    function updateCharts(sensors) {
-        const createChart = (canvasId, data, options) => {
-            const ctx = document.getElementById(canvasId)?.getContext('2d');
-            if (!ctx) return; // Якщо елемента немає на сторінці, нічого не робимо
-            if (charts[canvasId]) charts[canvasId].destroy(); // Знищуємо старий графік
-            
-            charts[canvasId] = new Chart(ctx, {
-                type: 'bar',
-                data: data,
-                options: {
-                    indexAxis: 'y', // Робить графік горизонтальним, краще для мобільних
-                    responsive: true,
-                    maintainAspectRatio: false, // Дозволяє CSS керувати розміром
-                    plugins: {
-                        legend: { display: false }, // Ховаємо легенду, бо назва є в заголовку
-                        title: { display: true, text: options.title }
-                    },
-                    scales: {
-                        x: {
-                            ticks: {
-                                callback: function(value) { return value + (options.unit || '') }
-                            }
+    // Цей код знаходиться всередині тегу <script> в файлі system.ejs
+
+function updateCharts(sensors) {
+    const createChart = (canvasId, data, options) => {
+        const ctx = document.getElementById(canvasId)?.getContext('2d');
+        if (!ctx) return;
+        if (charts[canvasId]) charts[canvasId].destroy();
+        
+        charts[canvasId] = new Chart(ctx, {
+            type: 'bar',
+            data: data,
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    title: { display: true, text: options.title }
+                },
+                scales: {
+                    x: {
+                        ticks: {
+                            callback: function(value) { return value + (options.unit || '') }
                         }
                     }
                 }
-            });
-        };
+            }
+        });
+    };
 
-        const airSensors = sensors.filter(s => s.sensor_type.toLowerCase() === 'air' && s.data_values);
-        const waterSensors = sensors.filter(s => s.sensor_type.toLowerCase() === 'water' && s.data_values);
-        const noiseSensors = sensors.filter(s => s.sensor_type.toLowerCase() === 'noise' && s.data_values);
+    const airSensors = sensors.filter(s => s.sensor_type.toLowerCase() === 'air' && s.data_values);
+    const waterSensors = sensors.filter(s => s.sensor_type.toLowerCase() === 'water' && s.data_values);
+    const noiseSensors = sensors.filter(s => s.sensor_type.toLowerCase() === 'noise' && s.data_values);
 
-        if (airSensors.length > 0) {
-            createChart('co2Chart', {
-                labels: airSensors.map(s => s.sensor_name),
-                datasets: [{ data: airSensors.map(s => s.data_values.co2 || 0), backgroundColor: '#ff6384' }]
-            }, { title: 'Рівень CO₂ (ppm)', unit: ' ppm' });
-            
-            createChart('pm25Chart', {
-                labels: airSensors.map(s => s.sensor_name),
-                datasets: [{ data: airSensors.map(s => s.data_values.pm25 || 0), backgroundColor: '#36a2eb' }]
-            }, { title: 'Частинки PM2.5 (µg/m³)', unit: ' µg/m³' });
-            
-            createChart('so2Chart', {
-                labels: airSensors.map(s => s.sensor_name),
-                datasets: [{ data: airSensors.map(s => s.data_values.so2 || 0), backgroundColor: '#cc65fe' }]
-            }, { title: 'Рівень SO₂ (µg/m³)', unit: ' µg/m³' });
-        }
-
-        if (waterSensors.length > 0) {
-            createChart('tempChart', {
-                labels: waterSensors.map(s => s.sensor_name),
-                datasets: [{ data: waterSensors.map(s => s.data_values.temperature || 0), backgroundColor: '#4bc0c0' }]
-            }, { title: 'Температура води (°C)', unit: '°C' });
-
-            createChart('acidityChart', {
-                labels: waterSensors.map(s => s.sensor_name),
-                datasets: [{ data: waterSensors.map(s => s.data_values.acidity || 0), backgroundColor: '#ff9f40' }]
-            }, { title: 'Кислотність (pH)', unit: ' pH' });
-        }
-
-        if (noiseSensors.length > 0) {
-            createChart('noiseChart', {
-                labels: noiseSensors.map(s => s.sensor_name),
-                datasets: [{ data: noiseSensors.map(s => s.data_values.level || 0), backgroundColor: '#ffcd56' }]
-            }, { title: 'Рівень шуму (dB)', unit: ' dB' });
-        }
+    if (airSensors.length > 0) {
+        createChart('co2Chart', {
+            labels: airSensors.map(s => s.sensor_name),
+            datasets: [{ data: airSensors.map(s => s.data_values.co2 || 0), backgroundColor: '#ff6384' }]
+        }, { title: 'Рівень CO₂ (ppm)', unit: ' ppm' });
+        
+        createChart('pm25Chart', {
+            labels: airSensors.map(s => s.sensor_name),
+            datasets: [{ data: airSensors.map(s => s.data_values.pm25 || 0), backgroundColor: '#36a2eb' }]
+        }, { title: 'Частинки PM2.5 (µg/m³)', unit: ' µg/m³' });
+        
+        createChart('so2Chart', {
+            labels: airSensors.map(s => s.sensor_name),
+            datasets: [{ data: airSensors.map(s => s.data_values.so2 || 0), backgroundColor: '#cc65fe' }]
+        }, { title: 'Рівень SO₂ (µg/m³)', unit: ' µg/m³' });
     }
+
+    if (waterSensors.length > 0) {
+        createChart('tempChart', {
+            labels: waterSensors.map(s => s.sensor_name),
+            datasets: [{ data: waterSensors.map(s => s.data_values.temperature || 0), backgroundColor: '#4bc0c0' }]
+        }, { title: 'Температура води (°C)', unit: '°C' });
+
+        createChart('acidityChart', {
+            labels: waterSensors.map(s => s.sensor_name),
+            // 🔥 ВИПРАВЛЕНО: 'acidity' змінено на 'ph'
+            datasets: [{ data: waterSensors.map(s => s.data_values.ph || 0), backgroundColor: '#ff9f40' }]
+        }, { title: 'Кислотність (pH)', unit: ' pH' });
+    }
+
+    if (noiseSensors.length > 0) {
+        createChart('noiseChart', {
+            labels: noiseSensors.map(s => s.sensor_name),
+            // 🔥 ВИПРАВЛЕНО: 'level' змінено на 'db_level'
+            datasets: [{ data: noiseSensors.map(s => s.data_values.db_level || 0), backgroundColor: '#ffcd56' }]
+        }, { title: 'Рівень шуму (dB)', unit: ' dB' });
+    }
+}
 
     // Основний потік виконання (без змін)
     try {
