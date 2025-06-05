@@ -236,3 +236,129 @@ footer a:hover {
         font-size: 14px;
     }
 }
+main.map-page-main {
+    display: flex;
+    flex-direction: row; /* Розташування панелі і карти поруч */
+    height: 100vh; /* Займає всю висоту в'юпорта */
+    padding-top: 74px; /* Відступ для фіксованого хедера */
+    box-sizing: border-box;
+}
+
+/* Бічна панель з фільтрами та легендою */
+.map-sidebar {
+    flex: 0 0 300px; /* Фіксована ширина панелі */
+    background-color: #ffffff;
+    padding: 20px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+    z-index: 900;
+    overflow-y: auto; /* Дозволяє скролити панель, якщо контент не вміщується */
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.sidebar-section h3 {
+    font-size: 18px;
+    color: #2c3e50;
+    margin-top: 0;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e7e9ec;
+}
+
+/* Фільтри */
+.filter-group label {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    user-select: none; /* Забороняємо виділення тексту */
+    display: flex;
+    align-items: center;
+}
+.filter-group input[type="checkbox"] {
+    margin-right: 10px;
+    width: 18px;
+    height: 18px;
+}
+
+/* Легенда */
+.legend {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.legend li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 15px;
+}
+
+.legend-icon {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%; /* Кругла іконка */
+    margin-right: 10px;
+    border: 1px solid rgba(0,0,0,0.1);
+}
+
+/* Інформаційна панель */
+#sidebar-info {
+    font-size: 14px;
+    color: #566573;
+    background-color: #f8f9fc;
+    padding: 10px;
+    border-radius: 5px;
+    min-height: 50px;
+    transition: background-color 0.3s ease;
+}
+
+/* Контейнер для карти */
+#map {
+    flex-grow: 1; /* Карта займає весь залишений простір */
+    height: 100%; /* Повна висота батьківського елемента */
+}
+
+/* Стилізація спливаючих вікон на карті (Popups) */
+.leaflet-popup-content-wrapper {
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.leaflet-popup-content {
+    margin: 15px;
+    font-size: 14px;
+    line-height: 1.5;
+}
+.leaflet-popup-content h4 {
+    margin: 0 0 10px;
+    font-size: 16px;
+    color: #2c3e50;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 8px;
+}
+.leaflet-popup-content p {
+    margin: 5px 0;
+}
+.leaflet-popup-tip-container {
+    width: 40px;
+    height: 20px;
+}
+
+/* Адаптивність для сторінки карти */
+@media (max-width: 768px) {
+    main.map-page-main {
+        flex-direction: column-reverse; /* Панель знизу на мобільних */
+        height: auto; /* Автоматична висота */
+    }
+    .map-sidebar {
+        flex: 0 0 auto; /* Не фіксована висота */
+        width: 100%;
+        box-shadow: 0 -2px 5px rgba(0,0,0,0.05); /* Тінь зверху */
+    }
+    #map {
+        height: 60vh; /* Карта займає 60% висоти екрану */
+        width: 100%;
+    }
+}

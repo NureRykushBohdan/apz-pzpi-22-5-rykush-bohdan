@@ -94,6 +94,12 @@ app.get("/login", (req, res) => {
     req.session.message = ""; // Очищення повідомлення після відображення
 });
 
+app.get("/system", (req, res) => {
+    if (!req.session.user && req.cookies.user) {
+        req.session.user = JSON.parse(req.cookies.user);
+    }
+    res.render("system/system", { title: "Cистема", user: req.session.user });
+});
 
 // Маршрут для сторінки "Про нас"
 app.get("/about-us", (req, res) => {
@@ -101,7 +107,10 @@ app.get("/about-us", (req, res) => {
 });
 
 app.get("/map", (req, res) => {
-    res.render("front/map", { title: "мапа", user: req.session.user });
+    res.render("front/map", { 
+        title: "Карта моніторингу",
+        user: req.session.user || null 
+    });
 });
 
 app.get("/about-system", (req, res) => {
@@ -382,7 +391,7 @@ const s3 = new S3Client({
 const upload = multer({
     storage: multerS3({
         s3: s3,
-        bucket: "nikkme",
+        bucket: "All buckets",
         acl: "public-read",
         key: (req, file, cb) => {
             const uniqueFileName = `profiles/${req.session.user.id}-${Date.now()}.webp`;
@@ -464,7 +473,91 @@ app.post("/update-password", async (req, res) => {
 });
 
 
+app.get("/api/sensors-with-latest-readings", async (req, res) => {
+    try {
+        // SQL-запит, який ми обговорювали раніше
+        const query = `
+            SELECT DISTINCT ON (s.sensor_id)
+                s.sensor_id,
+                s.sensor_name,
+                s.sensor_type,
+                s.latitude,
+                s.longitude,
+                r.status,
+                r.data_values,
+                r.timestamp AS last_updated
+            FROM 
+                sensors s
+            JOIN 
+                sensor_readings r ON s.sensor_id = r.sensor_id
+            WHERE
+                s.is_active = TRUE
+            ORDER BY 
+                s.sensor_id, 
+                r.timestamp DESC;
+        `;
+        const { rows } = await pool.query(query);
+        res.json(rows); // Відправляємо результат у форматі JSON
+    } catch (err) {
+        console.error("Помилка отримання даних для карти:", err);
+        res.status(500).json({ error: "Помилка сервера при завантаженні даних" });
+    }
+});
 
+
+// 2. Маршрут для додавання нового сенсора та його першого показника
+// ВАЖЛИВО: цей маршрут має бути захищеним, наприклад, доступним тільки для адміністраторів
+const checkAdmin = (req, res, next) => {
+    if (req.session.user && req.session.user.role === 'admin') {
+        return next();
+    }
+    return res.status(403).json({ message: "Доступ заборонено. Потрібні права адміністратора." });
+};
+
+app.post("/api/sensors", checkAdmin, async (req, res) => {
+    // В реальному проєкті тут має бути валідація даних (наприклад, через express-validator)
+    const { sensor_name, sensor_type, latitude, longitude, status, description, data_values } = req.body;
+
+    if (!sensor_name || !sensor_type || latitude == null || longitude == null) {
+        return res.status(400).json({ message: "Обов'язкові поля: назва, тип, широта та довгота." });
+    }
+
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN'); // Початок транзакції
+
+        // Крок 1: Додаємо новий сенсор до таблиці 'sensors' і отримуємо його ID
+        const newSensorQuery = `
+            INSERT INTO sensors (sensor_name, sensor_type, latitude, longitude, description) 
+            VALUES ($1, $2, $3, $4, $5) 
+            RETURNING sensor_id;
+        `;
+        const sensorResult = await client.query(newSensorQuery, [sensor_name, sensor_type, latitude, longitude, description]);
+        const newSensorId = sensorResult.rows[0].sensor_id;
+
+        // Крок 2: Додаємо перший показник для цього сенсора до таблиці 'sensor_readings'
+        // Переконуємося, що data_values є валідним JSON або null
+        const dataValuesToInsert = (data_values && Object.keys(data_values).length > 0) ? JSON.stringify(data_values) : null;
+        
+        if (dataValuesToInsert) {
+             const newReadingQuery = `
+                INSERT INTO sensor_readings (sensor_id, status, data_values) 
+                VALUES ($1, $2, $3);
+            `;
+            await client.query(newReadingQuery, [newSensorId, status, dataValuesToInsert]);
+        }
+       
+        await client.query('COMMIT'); // Завершення транзакції
+        res.status(201).json({ message: `Сенсор '${sensor_name}' успішно додано.` });
+
+    } catch (err) {
+        await client.query('ROLLBACK'); // Відкат транзакції у разі помилки
+        console.error("Помилка додавання нового сенсора:", err);
+        res.status(500).json({ message: "Помилка сервера при додаванні сенсора." });
+    } finally {
+        client.release(); // Повертаємо клієнта до пулу
+    }
+});
 
 // Запуск сервера
 app.listen(port, () => {
