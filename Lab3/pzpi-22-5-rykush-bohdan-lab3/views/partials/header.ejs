@@ -1,40 +1,46 @@
 <header id="main-header">
-        <div class="logo">
-            <a href="/"> EcoGuard</a>
-        </div>
-        <div class="header-right-content">
-            <nav>
+    <div class="logo">
+        <a href="/">EcoGuard</a>
+    </div>
+    <div class="header-right-content">
+        <nav>
             <% if (user) { %>
-            <a href="/system" >Система</a>
-
+                <a href="/system"><%= __('system') %></a>
             <% } %>
-                <a href="/" class="active">Головна</a>
-                <a href="/map">Карта Даних</a>
-                <a href="/about-system">Про Систему</a>
-                <a href="/contact">Контакти</a>
-            </nav>
-            <% if (user) { %>
-                
-                <div class="user-menu">
-                    <button id="user-name"><%= user.name %> &#9662;</button>
-                    <div class="dropdown-menu" id="dropdown-menu">
-    <a href="/profile">Профіль</a>
-    <a href="/settings">Налаштування</a>
 
-    <% if (user && user.role === 'admin') { %>
+            <a href="/"><%= __('Home') %></a>
+            <a href="/about-system"><%= __('About System') %></a>
+            <a href="/map"><%= __('Map') %></a>
+            
+            <a href="/contact"><%= __('Contact') %></a>
+        </nav>
+        
+        <div class="language-switcher">
+            <a href="/lang/uk" class="<%= lang === 'uk' ? 'active' : '' %>">UK</a>
+            <span>|</span>
+            <a href="/lang/en" class="<%= lang === 'en' ? 'active' : '' %>">EN</a>
+        </div>
+
+        <div class="auth-buttons">
+            <% if (user) { %>
+                <div class="user-menu">
+                    <button id="user-name"><%= user.name %></button>
+                    <div class="dropdown-menu" id="dropdown-menu">
+                        <a href="/profile"><%= __('Profile') %></a>
+                        <a href="/settings"><%= __('Settings') %></a>
+
+                            <% if (user && user.role === 'admin') { %>
         <hr>
-        <a href="/admin">Адмін-панель</a>
+        <a href="/admin">admin</a>
     <% } %>
 
-    <hr>
-    <a href="/logout">Вийти</a>
-</div>
+                        <a href="/logout"><%= __('Log Out') %></a>
+                    </div>
                 </div>
             <% } else { %>
-                <div class="auth-buttons">
-                    <a href="/login" class="login-btn">Увійти</a>
-                    <a href="/register" class="signup-btn">Реєстрація</a>
-                </div>
+                <a href="/login" class="login-btn"><%= __('Log In') %></a>
+                <a href="/register" class="signup-btn"><%= __('Sign Up') %></a>
             <% } %>
         </div>
-    </header>
+    </div>
+</header>

@@ -1,6 +1,6 @@
 require("dotenv").config();
 const express = require("express");
-const path =require("path");
+const path = require("path");
 const { Pool } = require("pg");
 const bcrypt = require("bcryptjs");
 const session = require("express-session");
@@ -14,11 +14,29 @@ const cookieParser = require("cookie-parser");
 const { createServer } = require('http');
 const { Server } = require("socket.io");
 const si = require('systeminformation');
+const i18n = require("i18n");
 
-// --- 1. ІНІЦІАЛІЗАЦІЯ ---
+const csv = require('csv-parser');
+const { Readable } = require('stream');
+
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer);
+
+// --- НАЛАШТУВАННЯ i18n --- // <-- ДОДАНО
+i18n.configure({
+    locales: ['uk', 'en'],
+    directory: path.join(__dirname, 'locales'),
+    defaultLocale: 'uk',
+    cookie: 'lang',
+    objectNotation: true,
+});
+
+
+const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 5 * 1024 * 1024 },
+});
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -27,6 +45,23 @@ app.use(cookieParser());
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
+
+
+// --- МІДЛВЕР ДЛЯ i18n --- // <-- ДОДАНО
+app.use(i18n.init);
+
+// 3. Додаємо діагностичний мідлвер
+app.use((req, res, next) => {
+    console.log(`\n--- Новий запит: ${req.method} ${req.path} ---`);
+    console.log(`[ДІАГНОСТИКА] Cookie 'lang', що прийшов від браузера:`, req.cookies.lang);
+    console.log(`[ДІАГНОСТИКА] Мова, визначена i18n (req.getLocale()):`, req.getLocale());
+    res.locals.__ = res.__;
+    res.locals.lang = req.getLocale(); // Передаємо поточну мову в шаблони
+    next();
+});
+
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
 
 
 const pool = new Pool({
@@ -55,6 +90,77 @@ app.use(session({
     }
 }));
 
+// Додайте цей маршрут у ваш server.js
+
+app.post('/api/admin/import', upload.single('csvFile'), async (req, res) => {
+    // Перевірка прав адміністратора
+    if (!req.session.user || req.session.user.role !== 'admin') {
+        return res.status(403).send('Доступ заборонено');
+    }
+
+    const { tableName } = req.body;
+    const file = req.file;
+
+    if (!file) {
+        return res.status(400).send('Файл не було завантажено.');
+    }
+
+    if (!['sensors', 'sensor_readings'].includes(tableName)) {
+        return res.status(400).send('Неприпустима назва таблиці.');
+    }
+
+    const results = [];
+    const stream = Readable.from(file.buffer).pipe(csv());
+    
+    stream.on('data', (data) => results.push(data));
+    
+    stream.on('end', async () => {
+        if (results.length === 0) {
+            return res.status(400).send('CSV файл порожній або має невірний формат.');
+        }
+
+        const client = await pool.connect();
+        try {
+            await client.query('BEGIN');
+
+            for (const row of results) {
+                // Очищення даних (приклад: перетворення порожніх рядків на null)
+                for (const key in row) {
+                    if (row[key] === '') {
+                        row[key] = null;
+                    }
+                }
+
+                const columns = Object.keys(row).join(', ');
+                const values = Object.values(row);
+                const placeholders = values.map((_, i) => `$${i + 1}`).join(', ');
+                
+                const query = `INSERT INTO ${tableName} (${columns}) VALUES (${placeholders})`;
+                await client.query(query, values);
+            }
+
+            await client.query('COMMIT');
+            // Перенаправлення назад з повідомленням про успіх
+            req.session.message = { type: 'success', text: `Successfully imported ${results.length} rows into ${tableName}` };
+            res.redirect('/admin');
+
+        } catch (err) {
+            await client.query('ROLLBACK');
+            console.error('Помилка імпорту CSV:', err);
+            // Перенаправлення назад з повідомленням про помилку
+            req.session.message = { type: 'error', text: `Error importing data: ${err.message}` };
+            res.redirect('/admin');
+        } finally {
+            client.release();
+        }
+    });
+
+    stream.on('error', (err) => {
+        console.error('Помилка парсингу CSV:', err);
+        req.session.message = { type: 'error', text: 'Failed to parse CSV file.' };
+        res.redirect('/admin');
+    });
+});
 const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -72,10 +178,31 @@ pool.query('SELECT NOW()', (err, res) => {
     }
 });
 
+// --- Маршрут для зміни мови --- // <-- ДОДАНО
+
+app.get('/lang/:lang', (req, res) => {
+    const { lang } = req.params;
+    console.log(`[ДІАГНОСТИКА] Отримано запит на зміну мови на: ${lang}`);
+    if (['uk', 'en'].includes(lang)) {
+        res.cookie('lang', lang, { maxAge: 900000, httpOnly: true });
+        console.log(`[ДІАГНОСТИКА] Cookie 'lang' було встановлено на: ${lang}`);
+    } else {
+        console.log(`[ДІАГНОСТИКА] Невірна мова: ${lang}. Cookie не встановлено.`);
+    }
+    const referer = req.header('Referer') || '/';
+    res.redirect(referer);
+});
 // Головна сторінка
 app.get("/", (req, res) => {
-    if (!req.session.user && req.cookies.user) {
-        req.session.user = JSON.parse(req.cookies.user);
+    console.log("[ДІАГНОСТИКА] Рендеринг головної сторінки. Поточна мова:", res.locals.lang);
+    try {
+        if (!req.session.user && req.cookies.user) {
+            req.session.user = JSON.parse(req.cookies.user);
+        }
+    } catch (error) {
+        console.error("Помилка розбору cookie користувача:", error);
+        res.clearCookie("user");
+        req.session.user = null;
     }
     res.render("front/index", { title: "Головна сторінка", user: req.session.user });
 });
@@ -411,11 +538,7 @@ const s3 = new S3Client({
     }
 });
 
-// Налаштування Multer для DigitalOcean Spaces
-const upload = multer({
-    storage: multer.memoryStorage(),
-    limits: { fileSize: 5 * 1024 * 1024 },
-});
+
 
 // В файлі server.js
 
