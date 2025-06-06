@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Підтвердження email</title>
+    <link rel="stylesheet" href="/style/email/confirmation.css">
+</head>
+<body>
+    <div class="container">
+        <% if (success) { %>
+            <div class="success-message">
+                <h2>✅ Підтвердження успішне!</h2>
+                <p><%= message %></p>
+                <a href="/login" class="button">Увійти</a>
+            </div>
+        <% } else { %>
+            <div class="error-message">
+                <h2>❌ Помилка підтвердження</h2>
+                <p><%= message %></p>
+                <a href="/" class="button">На головну</a>
+            </div>
+        <% } %>
+    </div>
+</body>
+</html>

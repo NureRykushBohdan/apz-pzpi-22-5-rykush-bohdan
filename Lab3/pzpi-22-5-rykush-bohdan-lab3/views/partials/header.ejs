@@ -1,0 +1,40 @@
+<header id="main-header">
+        <div class="logo">
+            <a href="/"> EcoGuard</a>
+        </div>
+        <div class="header-right-content">
+            <nav>
+            <% if (user) { %>
+            <a href="/system" >Система</a>
+
+            <% } %>
+                <a href="/" class="active">Головна</a>
+                <a href="/map">Карта Даних</a>
+                <a href="/about-system">Про Систему</a>
+                <a href="/contact">Контакти</a>
+            </nav>
+            <% if (user) { %>
+                
+                <div class="user-menu">
+                    <button id="user-name"><%= user.name %> &#9662;</button>
+                    <div class="dropdown-menu" id="dropdown-menu">
+    <a href="/profile">Профіль</a>
+    <a href="/settings">Налаштування</a>
+
+    <% if (user && user.role === 'admin') { %>
+        <hr>
+        <a href="/admin">Адмін-панель</a>
+    <% } %>
+
+    <hr>
+    <a href="/logout">Вийти</a>
+</div>
+                </div>
+            <% } else { %>
+                <div class="auth-buttons">
+                    <a href="/login" class="login-btn">Увійти</a>
+                    <a href="/register" class="signup-btn">Реєстрація</a>
+                </div>
+            <% } %>
+        </div>
+    </header>

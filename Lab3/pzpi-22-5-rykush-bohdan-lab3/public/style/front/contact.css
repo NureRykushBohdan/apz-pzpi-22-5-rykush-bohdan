@@ -1,0 +1,341 @@
+/* Глобальні стилі */
+html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden; 
+    display: flex;
+    flex-direction: column;
+    font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Сучасний, чистий шрифт */
+    background-color: #eef2f5; /* Дуже світлий, майже білий фон, технологічний */
+    color: #333a45; /* Темно-сірий для основного тексту */
+}
+
+header {
+    display: flex;
+    justify-content: space-between; /* Розміщення лого зліва, навігації та кнопок справа */
+    align-items: center;
+    padding: 15px 40px; /* Оптимізований паддінг */
+    width: 100%;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    transition: box-shadow 0.3s ease, background-color 0.3s ease;
+    position: fixed;
+    background: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Легка початкова тінь */
+    box-sizing: border-box;
+}
+
+header.scrolled {
+    box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.08); /* Більш виражена тінь при скролі */
+}
+
+/* Логотип */
+.logo a {
+    display: flex;
+    align-items: center;
+    font-size: 28px; /* Зменшено для більш витонченого вигляду */
+    font-weight: 700; /* Більш жирний для акценту */
+    color: #2c3e50; /* Темний, насичений синьо-сірий */
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+.logo a:hover {
+    color: #1a252f;
+}
+
+.logo img {
+    height: 32px; /* Відповідно до розміру шрифту */
+    margin-right: 10px;
+}
+
+/* Навігація та кнопки авторизації разом */
+.header-right-content {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+/* Стилі для навігації */
+nav {
+    display: flex;
+    gap: 25px;
+}
+
+nav a {
+    color: #34495e; /* Спокійний синьо-сірий */
+    text-decoration: none;
+    font-size: 17px; /* Оптимальний розмір для навігації */
+    font-weight: 500;
+    transition: color 0.3s ease;
+    padding: 5px 0;
+    position: relative; /* Для анімації підкреслення */
+}
+
+nav a::after { /* Ефект підкреслення при ховері */
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -2px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #3498db; /* Яскравий синій акцент */
+    transition: width 0.3s ease;
+}
+
+nav a:hover::after, nav a.active::after {
+    width: 100%;
+}
+nav a:hover, nav a.active {
+    color: #3498db; /* Яскравий синій при ховері/активності */
+}
+
+
+/* Кнопки авторизації */
+.auth-buttons {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.login-btn {
+    color: #3498db;
+    font-size: 17px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+    padding: 8px 15px;
+    border: 1px solid transparent; /* Для збереження розміру */
+    border-radius: 5px;
+}
+
+.login-btn:hover {
+    color: #2980b9;
+    background-color: #ecf0f1; /* Дуже світлий фон при ховері */
+}
+
+.signup-btn {
+    background: #3498db;
+    color: white;
+    padding: 8px 20px;
+    border-radius: 5px; /* Гостріші кути */
+    font-weight: 500;
+    text-decoration: none;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    font-size: 17px;
+    border: 1px solid #3498db;
+}
+
+.signup-btn:hover {
+    background: #2980b9;
+    border-color: #2980b9;
+    transform: translateY(-1px);
+}
+
+.user-menu {
+    position: relative;
+    display: inline-block;
+}
+
+#user-name {
+    background: none;
+    border: none;
+    font-size: 17px;
+    cursor: pointer;
+    padding: 8px 10px;
+    color: #2c3e50;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+#user-name:hover {
+    color: #3498db;
+}
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background: white;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.08);
+    padding: 8px 0;
+    border-radius: 5px;
+    min-width: 180px;
+    z-index: 10;
+}
+
+.dropdown-menu a {
+    text-decoration: none;
+    color: #333a45;
+    display: block;
+    padding: 10px 18px;
+    font-size: 15px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.dropdown-menu a:hover {
+    background: #f5f7f9;
+    color: #3498db;
+}
+
+
+footer {
+    width: 100%;
+    background: #2c3e50; /* Темний синьо-сірий */
+    color: #bdc3c7; /* Світло-сірий текст */
+    text-align: center;
+    padding: 30px 20px;
+    font-size: 15px;
+    margin-top: auto;
+    line-height: 1.6;
+}
+footer p {
+    margin: 5px 0;
+}
+footer a {
+    color: #5dade2; /* Світліший синій для посилань */
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+footer a:hover {
+    color: #85c1e9;
+    text-decoration: underline;
+}
+
+body.contact-page { /* Можна додати цей клас до body на сторінці контактів */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main.contact-page-main {
+    flex-grow: 1;
+    display: flex;
+    align-items: center; /* Центрування по вертикалі */
+    justify-content: center; /* Центрування по горизонталі */
+    padding: 100px 20px; /* Відступи зверху (для хедера) та знизу */
+    box-sizing: border-box;
+}
+
+.contact-container-wrapper {
+    background-color: #ffffff;
+    padding: 30px 40px; /* Збільшено горизонтальний паддінг */
+    border-radius: 8px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07); /* М'якша тінь */
+    width: 100%;
+    max-width: 550px; /* Трохи ширше для комфорту */
+    text-align: center;
+}
+
+.contact-container-wrapper h2 {
+    color: #2c3e50; 
+    margin-bottom: 30px; 
+    font-size: 26px; 
+    font-weight: 600;
+}
+
+.contact-container-wrapper .form-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.contact-container-wrapper label {
+    display: block;
+    margin-bottom: 8px;
+    color: #34495e;
+    font-weight: 500;
+    font-size: 15px;
+}
+
+.contact-container-wrapper input[type="email"],
+.contact-container-wrapper textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    font-size: 16px;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    font-family: inherit; /* Успадкування шрифту */
+}
+
+.contact-container-wrapper input[type="email"]:focus,
+.contact-container-wrapper textarea:focus {
+    border-color: #3498db;
+    outline: none;
+    box-shadow: 0 0 0 0.15rem rgba(52, 152, 219, 0.2);
+}
+
+.contact-container-wrapper input[readonly] {
+    background-color: #e9ecef;
+    cursor: not-allowed;
+}
+
+.contact-container-wrapper textarea {
+    resize: vertical; 
+    min-height: 120px;
+}
+
+.contact-container-wrapper button[type="submit"] {
+    width: 100%;
+    padding: 12px 20px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 17px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    margin-top: 10px;
+}
+
+.contact-container-wrapper button[type="submit"]:hover {
+    background-color: #2980b9;
+    transform: translateY(-1px);
+}
+
+.success-message {
+    background-color: #d1e7dd; /* Світло-зелений */
+    color: #0f5132;  /* Темно-зелений текст */
+    border: 1px solid #badbcc;
+    padding: 12px 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    font-size: 15px;
+    text-align: left;
+}
+.success-message p {
+    margin: 0;
+}
+
+.error-message-contact {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    padding: 12px 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    font-size: 15px;
+    text-align: left;
+}
+.error-message-contact p {
+    margin: 0;
+}
+
+#char-count {
+    font-size: 13px; /* Менший розмір */
+    text-align: right;
+    color: #6c757d;
+    margin-top: 5px;
+    display: block; /* Щоб був на новому рядку */
+}
+
+
+

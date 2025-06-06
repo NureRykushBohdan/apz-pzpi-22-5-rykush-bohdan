@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/style/users/profile.css">
+</head>
+<body>
+
+  <%- include('../partials/header') %>
+
+<div class="profile-container">
+    <div class="profile-picture">
+        <% let profilePic = user.profile_picture; %>
+        <% if (!profilePic || !profilePic.startsWith('http')) { profilePic = 'https://nikkme.fra1.digitaloceanspaces.com/profiles/default-avatar.webp'; } %>
+        <img src="<%= profilePic %>" alt="Фото профілю" class="profile-image">
+    </div>
+    
+    
+    <p><strong>Ім'я:</strong> <%= user.name %></p>
+    <p><strong>Email:</strong> <%= user.email %></p>
+    <p><strong>Рівень знань:</strong> <%= user.knowledge_level || "Не визначено" %></p>
+</div>
+
+ <%- include('../partials/footer') %>
+
+<script src="/js/users/profile.js" defer></script>
+<script src="/js/partials/footer.js" defer></script>
+</body>
+</html>

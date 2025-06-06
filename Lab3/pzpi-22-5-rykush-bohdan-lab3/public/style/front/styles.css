@@ -1,0 +1,720 @@
+/* Глобальні стилі */
+html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden; 
+    display: flex;
+    flex-direction: column;
+    font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Сучасний, чистий шрифт */
+    background-color: #eef2f5; /* Дуже світлий, майже білий фон, технологічний */
+    color: #333a45; /* Темно-сірий для основного тексту */
+}
+
+header {
+    display: flex;
+    justify-content: space-between; /* Розміщення лого зліва, навігації та кнопок справа */
+    align-items: center;
+    padding: 15px 40px; /* Оптимізований паддінг */
+    width: 100%;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    transition: box-shadow 0.3s ease, background-color 0.3s ease;
+    position: fixed;
+    background: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Легка початкова тінь */
+    box-sizing: border-box;
+}
+
+header.scrolled {
+    box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.08); /* Більш виражена тінь при скролі */
+}
+
+/* Логотип */
+.logo a {
+    display: flex;
+    align-items: center;
+    font-size: 28px; /* Зменшено для більш витонченого вигляду */
+    font-weight: 700; /* Більш жирний для акценту */
+    color: #2c3e50; /* Темний, насичений синьо-сірий */
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+.logo a:hover {
+    color: #1a252f;
+}
+
+.logo img {
+    height: 32px; /* Відповідно до розміру шрифту */
+    margin-right: 10px;
+}
+
+/* Навігація та кнопки авторизації разом */
+.header-right-content {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+/* Стилі для навігації */
+nav {
+    display: flex;
+    gap: 25px;
+}
+
+nav a {
+    color: #34495e; /* Спокійний синьо-сірий */
+    text-decoration: none;
+    font-size: 17px; /* Оптимальний розмір для навігації */
+    font-weight: 500;
+    transition: color 0.3s ease;
+    padding: 5px 0;
+    position: relative; /* Для анімації підкреслення */
+}
+
+nav a::after { /* Ефект підкреслення при ховері */
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -2px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #3498db; /* Яскравий синій акцент */
+    transition: width 0.3s ease;
+}
+
+nav a:hover::after, nav a.active::after {
+    width: 100%;
+}
+nav a:hover, nav a.active {
+    color: #3498db; /* Яскравий синій при ховері/активності */
+}
+
+
+/* Кнопки авторизації */
+.auth-buttons {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.login-btn {
+    color: #3498db;
+    font-size: 17px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+    padding: 8px 15px;
+    border: 1px solid transparent; /* Для збереження розміру */
+    border-radius: 5px;
+}
+
+.login-btn:hover {
+    color: #2980b9;
+    background-color: #ecf0f1; /* Дуже світлий фон при ховері */
+}
+
+.signup-btn {
+    background: #3498db;
+    color: white;
+    padding: 8px 20px;
+    border-radius: 5px; /* Гостріші кути */
+    font-weight: 500;
+    text-decoration: none;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    font-size: 17px;
+    border: 1px solid #3498db;
+}
+
+.signup-btn:hover {
+    background: #2980b9;
+    border-color: #2980b9;
+    transform: translateY(-1px);
+}
+
+.user-menu {
+    position: relative;
+    display: inline-block;
+}
+
+#user-name {
+    background: none;
+    border: none;
+    font-size: 17px;
+    cursor: pointer;
+    padding: 8px 10px;
+    color: #2c3e50;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+#user-name:hover {
+    color: #3498db;
+}
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background: white;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.08);
+    padding: 8px 0;
+    border-radius: 5px;
+    min-width: 180px;
+    z-index: 10;
+}
+
+.dropdown-menu a {
+    text-decoration: none;
+    color: #333a45;
+    display: block;
+    padding: 10px 18px;
+    font-size: 15px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.dropdown-menu a:hover {
+    background: #f5f7f9;
+    color: #3498db;
+}
+
+/* Прелоадер */
+#preloader {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.loader {
+    width: 45px;
+    height: 45px;
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-top: 4px solid #3498db; /* Колір акценту */
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite; /* Швидша анімація */
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Стилі загальних кнопок */
+.btn {
+    display: inline-block;
+    padding: 10px 28px; /* Оптимізовано */
+    border: 1px solid #3498db; 
+    border-radius: 5px;
+    font-weight: 500;
+    text-decoration: none;
+    color: #3498db; 
+    background: transparent;
+    transition: all 0.25s ease-in-out;
+    cursor: pointer;
+    font-size: 17px;
+}
+
+.btn.large {
+    font-size: 18px;
+    padding: 12px 35px;
+}
+
+.btn:hover {
+    background: #3498db; 
+    color: #fff; 
+}
+.btn.primary { /* Додатковий стиль для головної кнопки */
+    background: #3498db;
+    color: #fff;
+}
+.btn.primary:hover {
+    background: #2980b9;
+    border-color: #2980b9;
+}
+
+
+.btn:active {
+    background: #2980b9; 
+    border-color: #2980b9;
+    transform: translateY(1px);
+}
+
+/* Головна секція (Hero) */
+.start_bady {
+    padding: 140px 20px 80px; /* Збільшено верхній паддінг */
+    text-align: center;
+    background: linear-gradient(to bottom, #ffffff 0%, #f4f7f9 100%); /* Легкий градієнт */
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.start_bady.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.start_bady h1 {
+    color: #1f2c39; /* Дуже темний синьо-сірий */
+    font-size: 44px; /* Трохи зменшено для балансу, але все ще великий */
+    font-weight: 700;
+    margin-bottom: 25px;
+    line-height: 1.25;
+    max-width: 800px; /* Обмеження ширини */
+}
+
+.start_bady p {
+    font-size: 19px; 
+    color: #566573; /* М'який сірий */
+    max-width: 750px;
+    margin: 0 auto 35px auto;
+    line-height: 1.65;
+}
+
+/* Основний контейнер для контенту сторінки */
+main {
+    flex: 1;
+    padding-top: 74px; /* Висота хедера */
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.home-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    max-width: 1140px; /* Стандартна ширина контейнера */
+    margin: 0 auto;
+    padding: 50px 20px; /* Збільшено вертикальний паддінг */
+}
+.home-section:nth-child(odd) { /* Чергування фону для секцій */
+    background-color: #ffffff;
+}
+.home-section:nth-child(even) {
+    background-color: #f8f9fc; /* Дуже світлий фон для чергування */
+}
+
+
+/* Секція "Про нас" (Intro) */
+.intro { /* Може бути використана як секція "Про проєкт" */
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    width: 100%; /* Займає всю ширину .home-section */
+    padding: 0; /* Паддінг тепер у .home-section */
+    border-radius: 0; /* Забираємо, якщо це частина .home-section */
+    box-shadow: none;
+    margin-bottom: 0; /* Керується .home-section */
+}
+
+.intro img { /* Зображення для ілюстрації системи */
+    width: 45%;
+    max-width: 450px;
+    height: auto;
+    border-radius: 8px;
+    object-fit: cover;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.07);
+}
+
+.intro-text-content {
+    text-align: left;
+    flex: 1;
+}
+
+.intro-text-content h2 {
+    font-size: 32px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 20px;
+}
+
+.intro-text-content p {
+    font-size: 17px;
+    color: #4a5568; /* Трохи світліший сірий */
+    line-height: 1.7;
+    margin-bottom: 15px; /* Відступи між параграфами */
+}
+.intro-text-content ul { /* Стилізація списків, якщо є */
+    list-style: none;
+    padding-left: 0;
+    margin-bottom: 20px;
+}
+.intro-text-content li {
+    font-size: 17px;
+    color: #4a5568;
+    line-height: 1.7;
+    padding-left: 25px;
+    position: relative;
+    margin-bottom: 8px;
+}
+.intro-text-content li::before {
+    content: '✓'; /* Unicode checkmark */
+    color: #3498db;
+    position: absolute;
+    left: 0;
+    font-weight: bold;
+}
+
+
+/* Секція переваг */
+.advantages {
+    width: 100%;
+    padding: 0; /* Паддінг тепер у .home-section */
+}
+
+.advantages-header { /* Окремий заголовок для секції */
+    margin-bottom: 40px;
+}
+.advantages-header h2 {
+    font-size: 34px;
+    color: #2c3e50;
+    font-weight: 600;
+}
+.advantages-header p { /* Підзаголовок для секції переваг */
+    font-size: 18px;
+    color: #566573;
+    max-width: 700px;
+    margin: 10px auto 0 auto;
+    line-height: 1.6;
+}
+
+
+.advantages-grid { /* Використання grid для переваг */
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Адаптивні колонки */
+    gap: 30px;
+}
+
+.advantage-item { /* Стилізація окремої переваги як картки */
+    display: flex;
+    flex-direction: column; /* Вертикальне розташування */
+    align-items: flex-start; /* Вирівнювання по лівому краю */
+    text-align: left;
+    background-color: #ffffff;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.06);
+    opacity: 0;
+    will-change: transform, opacity;
+    transform: translate3d(0, 20px, 0);
+    transition: opacity 0.5s ease-out, transform 0.5s ease-out, box-shadow 0.3s ease;
+}
+.advantage-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+.advantage-item img { /* Зображення або іконка для переваги */
+    width: 100%; /* Адаптивне зображення */
+    max-height: 200px; /* Обмеження висоти */
+    border-radius: 6px;
+    object-fit: cover;
+    margin-bottom: 20px;
+}
+/* Якщо замість img будуть іконки: */
+.advantage-icon {
+    font-size: 40px; /* Розмір іконки */
+    color: #3498db;
+    margin-bottom: 15px;
+    /* Тут можна додати стилі для SVG або font-icon */
+}
+
+
+.advantage-text h3 {
+    font-size: 22px;
+    color: #3498db;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.advantage-text p {
+    font-size: 16px;
+    color: #4a5568;
+    line-height: 1.65;
+}
+
+.advantage-item.visible {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+}
+
+/* Контейнер FAQ */
+.faq-section-wrapper {
+    background-color: #ffffff; /* Змінено на білий для чергування */
+    padding: 60px 0;
+    width: 100%;
+}
+
+.faq-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0; /* Паддінг тепер у .home-section або .faq-section-wrapper */
+    background-color: transparent; /* Прозорий, бо фон вже є */
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.faq-title {
+    font-size: 34px;
+    color: #2c3e50;
+    margin-bottom: 40px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.faq-content {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 40px;
+}
+
+.faq-image {
+    flex: 0 0 38%; /* Трохи менше місця для зображення */
+    max-width: 320px;
+}
+
+.faq-image img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+.faq-questions-wrapper {
+    flex: 1;
+    min-width: 0;
+}
+
+.faq-item {
+    margin-bottom: 10px;
+    border: 1px solid #e7e9ec; /* Рамка для кожного питання */
+    border-radius: 6px;
+    background-color: #fdfdfe; /* Дуже світлий фон для питання */
+    transition: background-color 0.2s ease;
+}
+.faq-item:hover {
+    background-color: #f8f9fc;
+}
+
+
+.faq-question {
+    font-size: 17px;
+    color: #333a45;
+    font-weight: 500;
+    padding: 15px 20px; /* Збільшено паддінг */
+    transition: color 0.2s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+.faq-question::after {
+    content: '+';
+    font-size: 20px;
+    color: #3498db;
+    transition: transform 0.3s ease;
+}
+
+.faq-item.open .faq-question::after {
+    transform: rotate(45deg);
+}
+
+.faq-answer {
+    display: none;
+    padding: 0px 20px 15px 20px; /* Паддінг для відповіді */
+    font-size: 15px;
+    color: #566573;
+    line-height: 1.65;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease-out, opacity 0.35s ease-out, padding-top 0.35s ease-out, padding-bottom 0.35s ease-out;
+    border-top: 1px solid #e7e9ec; /* Лінія між питанням та відповіддю */
+    margin-top: -1px; /* Щоб лінія була точно під питанням */
+}
+.faq-item.open {
+    background-color: #fff; /* Фон відкритого питання */
+}
+
+.faq-item.open .faq-answer {
+    display: block;
+    max-height: 500px;
+    opacity: 1;
+    padding-top: 15px; /* Додаємо паддінг при відкритті */
+}
+
+.faq-item.open .faq-question {
+    color: #3498db;
+}
+
+/* Футер */
+footer {
+    width: 100%;
+    background: #2c3e50; /* Темний синьо-сірий */
+    color: #bdc3c7; /* Світло-сірий текст */
+    text-align: center;
+    padding: 30px 20px;
+    font-size: 15px;
+    margin-top: auto;
+    line-height: 1.6;
+}
+footer p {
+    margin: 5px 0;
+}
+footer a {
+    color: #5dade2; /* Світліший синій для посилань */
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+footer a:hover {
+    color: #85c1e9;
+    text-decoration: underline;
+}
+
+/* Адаптивність */
+@media (max-width: 992px) {
+    .header-right-content {
+        gap: 15px; /* Зменшуємо відстань для компактності */
+    }
+    nav {
+        gap: 15px;
+    }
+    nav a, .login-btn, .signup-btn, #user-name {
+        font-size: 16px;
+    }
+    .intro, .advantage-item { /* Застосовується до advantage-item, якщо він не в grid */
+        flex-direction: column;
+        text-align: center;
+    }
+    .advantage-item.reverse {
+        flex-direction: column;
+    }
+    .intro img { /* Якщо intro - окрема секція */
+        width: 70%;
+        max-width: 300px;
+        margin-bottom: 20px;
+    }
+    .advantage-item img { /* Якщо advantage-item не в grid */
+         width: 70%;
+        max-width: 300px;
+        margin-bottom: 20px;
+    }
+    .intro-text-content, .advantage-text { /* Якщо advantage-item не в grid */
+        width: 100%;
+        text-align: center;
+    }
+    .faq-content {
+        flex-direction: column;
+        align-items: center;
+    }
+    .faq-image {
+        max-width: 70%;
+        margin-bottom: 30px;
+    }
+}
+
+@media (max-width: 768px) {
+    header {
+        padding: 10px 20px;
+        justify-content: space-between; /* Лого зліва, гамбургер (якщо буде) справа */
+    }
+    /* Тут можна додати стилі для мобільного меню (гамбургера), якщо воно реалізовано */
+    /* Для прикладу, приховуємо навігацію і кнопки */
+    .header-right-content {
+       /* display: none; /* Або реалізувати через JS */
+       /* Поки що залишимо, але може знадобитися гамбургер */
+       flex-wrap: wrap;
+       justify-content: center;
+       gap: 10px;
+       width: 100%;
+       margin-top: 10px; /* Якщо хедер стає column */
+    }
+     nav {
+        order: 2; /* Навігація після кнопок, якщо хедер column */
+        width: 100%;
+        justify-content: center;
+    }
+    .auth-buttons {
+        order: 1;
+    }
+
+    .logo a {
+        font-size: 24px;
+    }
+    .logo img {
+        height: 28px;
+    }
+    .start_bady {
+        padding-top: 100px; /* Менший відступ для мобільних */
+    }
+    .start_bady h1 {
+        font-size: 34px;
+    }
+    .start_bady p {
+        font-size: 17px;
+    }
+    .home-section {
+        padding: 30px 15px;
+    }
+    .intro-text-content h2, .advantages-header h2, .faq-title {
+        font-size: 28px;
+    }
+     .advantage-text h3 {
+        font-size: 20px;
+    }
+    .advantage-text p, .intro-text-content p {
+        font-size: 15px;
+    }
+    .faq-question {
+        font-size: 16px;
+        padding: 12px 15px;
+    }
+    .faq-answer {
+        font-size: 14px;
+        padding: 0 15px 12px 15px;
+    }
+     .faq-item.open .faq-answer {
+        padding-top: 12px;
+    }
+    .btn.large {
+        font-size: 17px;
+        padding: 10px 25px;
+    }
+}
+
+@media (max-width: 480px) {
+    .start_bady h1 {
+        font-size: 28px;
+    }
+    .start_bady p {
+        font-size: 16px;
+    }
+    .intro-text-content h2, .advantages-header h2, .faq-title {
+        font-size: 24px;
+    }
+    .advantages-grid {
+        grid-template-columns: 1fr; /* Одна колонка на малих екранах */
+    }
+    footer {
+        padding: 20px 15px;
+        font-size: 14px;
+    }
+}

@@ -1,0 +1,97 @@
+/* --- ОСНОВНІ СТИЛІ СТОРІНКИ --- */
+.system-main {
+    padding: 20px;
+    padding-top: 94px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.widget {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.widget h3 {
+    font-size: 20px;
+    color: #2c3e50;
+    margin-top: 0;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #3498db;
+    display: inline-block;
+}
+
+.welcome-widget {
+    text-align: center;
+    background: none;
+    box-shadow: none;
+    padding: 0 20px 20px;
+}
+.welcome-widget h1 { font-size: 32px; }
+
+/* --- СТИЛІ СІТКИ (GRID) --- */
+.system-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+    grid-template-areas:
+        "welcome welcome welcome"
+        "nearest-sensor history history"
+        "map-widget map-widget leaderboard"
+        "stats stats stats";
+}
+
+/* Призначення віджетів до їх областей */
+.welcome-widget { grid-area: welcome; }
+.nearest-sensor-widget { grid-area: nearest-sensor; }
+.history-widget { grid-area: history; }
+.map-widget { grid-area: map-widget; }
+.leaderboard-widget { grid-area: leaderboard; }
+.stats-widget { grid-area: stats; }
+
+
+/* --- СТИЛІ ДЛЯ ОКРЕМИХ ВІДЖЕТІВ --- */
+#mini-map { height: 250px; border-radius: 6px; margin-bottom: 10px; }
+.map-link { display: block; text-align: right; color: #3498db; text-decoration: none; }
+.status-good, .status-добре { color: #28a745; font-weight: bold; }
+.status-moderate, .status-помірно { color: #fd7e14; font-weight: bold; }
+.status-poor, .status-погано { color: #dc3545; font-weight: bold; }
+
+/* Рейтинг */
+.leaderboard-columns { display: flex; justify-content: space-between; gap: 20px; }
+.leaderboard-column { width: 50%; }
+.leaderboard-column h4 { font-size: 16px; margin-bottom: 10px; }
+.leaderboard-column ul { list-style: none; padding: 0; margin: 0; }
+.leaderboard-column li { padding: 5px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; font-size: 14px; }
+.leaderboard-column li span { font-weight: bold; color: #566573; }
+
+/* Кнопки для графіка історії */
+.history-controls { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
+.history-controls button { background-color: #f0f0f0; border: 1px solid #ddd; border-radius: 15px; padding: 5px 12px; font-size: 13px; cursor: pointer; transition: all 0.2s ease; }
+.history-controls button:hover { background-color: #e0e0e0; }
+.history-controls button.active { background-color: #3498db; color: white; border-color: #3498db; }
+
+/* Статистика */
+.chart-groups-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+.chart-group { background-color: #f8f9fa; padding: 15px; border-radius: 6px; border: 1px solid #e9ecef; }
+.chart-group h4 { text-align: center; font-size: 18px; color: #34495e; margin-top: 0; margin-bottom: 15px; }
+.chart-item { height: 220px; position: relative; width: 100%; margin-bottom: 15px; }
+.chart-item:last-child { margin-bottom: 0; }
+
+/* --- АДАПТИВНІСТЬ --- */
+@media (max-width: 1200px) {
+    .system-grid {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "welcome"
+            "nearest-sensor"
+            "history"
+            "map-widget"
+            "leaderboard"
+            "stats";
+    }
+}

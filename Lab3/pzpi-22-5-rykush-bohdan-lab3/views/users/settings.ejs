@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Налаштування профілю</title>
+    <link rel="stylesheet" href="/style/users/settings.css">
+</head>
+<body>
+
+<!-- Спливаючі повідомлення -->
+<% if (message) { %>
+    <div id="success-toast" class="toast"><%= message %></div>
+<% } %>
+
+
+  <%- include('../partials/header') %>
+
+<div class="settings-container">
+    <h2>Налаштування профілю</h2>
+
+    <!-- Фото профілю -->
+   <!-- Фото профілю -->
+<div class="profile-picture">
+    <% let profilePic = user.profile_picture; %>
+    <% if (!profilePic || !profilePic.startsWith('http')) { profilePic = 'https://nikkme.fra1.cdn.digitaloceanspaces.com/profiles/default-avatar.png'; } %>
+    <img src="<%= profilePic %>" alt="Фото профілю" class="profile-pic">
+</div>
+
+    
+    <form action="/upload-profile-pic" method="POST" enctype="multipart/form-data">
+        <input type="file" name="profilePic" accept="image/webp" required>
+        <button type="submit">Оновити фото</button>
+    </form>
+    
+    
+    
+
+    <!-- Оновлення нікнейму -->
+    <form action="/update-name" method="POST">
+        <input type="text" name="newName" placeholder="Новий нікнейм" value="<%= user.name %>">
+        <div class="form-group">
+            <button type="submit">Оновити нікнейм</button>
+        </div>
+    </form>
+
+    <!-- Оновлення пароля -->
+    <form action="/update-password" method="POST">
+        <input type="password" name="oldPassword" placeholder="Старий пароль">
+        <input type="password" name="newPassword" placeholder="Новий пароль">
+        <div class="form-group">
+            <button type="submit">Оновити пароль</button>
+        </div>
+    </form>
+    <hr>
+
+<div class="form-group">
+    <h3>Моє місцезнаходження</h3>
+    <p>Натисніть кнопку, щоб оновити ваше поточне місцезнаходження для персоналізації даних.</p>
+    <button id="update-location-btn">Оновити моє місцезнаходження</button>
+    <p id="location-status" style="margin-top: 10px;"></p>
+</div>
+</div>
+
+
+ <%- include('../partials/footer') %>
+
+<script src="/js/users/settings.js" defer></script>
+<script src="/js/partials/footer.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Реєстрація | EcoGuard</title>
+    <link rel="stylesheet" href="/style/users/register.css">
+</head>
+<body>
+    <div id="preloader">
+        <div class="loader"></div>
+    </div>
+     <header id="main-header">
+        <div class="logo">
+            <a href="/"> EcoGuard</a>
+        </div>
+        <div class="header-right-content">
+            <nav>
+                <a href="/" >Головна</a>
+                <a href="/map">Карта Даних</a>
+                <a href="/about-system">Про Систему</a>
+                <a href="/contact" >Контакти</a>
+            </nav>
+  
+                <div class="auth-buttons">
+                    <a href="/login" class="login-btn">Увійти</a>
+                    <a href="/register"  class="signup-btn">Реєстрація</a>
+                </div>
+         
+        </div>
+    </header>
+
+    <main>
+        <div id="success-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <h2>Реєстрація успішна!</h2>
+                <p>Ви успішно зареєструвалися. Натисніть кнопку, щоб перейти на головну сторінку.</p>
+                <a href="/" class="button">На головну</a>
+            </div>
+        </div>
+        
+        
+        
+        
+        <div class="register-container">
+            <h2>Реєстрація</h2>
+        
+           
+            <form id="register-form">
+                <input type="text" id="name" name="name" placeholder="Ваше ім'я" required>
+                <input type="email" id="email" name="email" placeholder="Email" required>
+                <input type="password" id="password" name="password" placeholder="Пароль" required>
+                <input type="password" id="confirm-password" name="confirm-password" placeholder="Повторіть пароль" required>
+                <p id="error-message" style="color: red; display: none;"></p>
+                <button type="submit">Зареєструватися</button>
+            </form>
+        </div>
+    </main>
+    
+<footer>
+        <p>© <%= new Date().getFullYear() %> EcoGuard. Програмна система моніторингу екологічного стану місцевості.</p>
+        <p><a href="/privacy-policy">Політика конфіденційності</a> | <a href="/terms-of-use">Умови використання</a></p>
+    </footer>
+    
+    <script src="/js/users/register.js"></script>
+    
+
+</body>
+</html>
