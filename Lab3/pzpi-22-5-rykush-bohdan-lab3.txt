@@ -1,0 +1,310 @@
+@startuml
+' Задаємо назву діаграми
+title Повна UML діаграма прецедентів
+
+' Визначення Акторів
+actor "Гість" as Guest
+actor "Користувач" as User
+actor "Адміністратор" as Admin
+actor "Імітатор Сенсорів" as SensorSimulator
+actor "Поштовий Сервіс" as EmailService
+
+' Групування прецедентів у пакети
+package "Система Моніторингу Даних" {
+
+  package "Основні функції" {
+    usecase "Реєстрація" as uc1
+    usecase "Авторизація" as uc2
+    usecase "Перегляд публічного контенту" as uc3
+    usecase "Перегляд карти сенсорів" as uc4
+    usecase "Зміна мови інтерфейсу" as uc5
+  }
+
+  package "Функції користувача" {
+    usecase "Керування власним профілем" as uc6
+    usecase "Вихід із системи (Logout)" as uc7
+    usecase "Перегляд панелі керування" as uc8
+
+    usecase "Зміна особистих даних" as uc6_1
+    usecase "Зміна пароля" as uc6_2
+    usecase "Завантаження аватара" as uc6_3
+  }
+
+  package "Функції адміністратора" {
+    usecase "Доступ до Адмін-панелі" as uc9
+
+    usecase "Перегляд списку користувачів" as uc9_1
+    usecase "Редагування ролі користувача" as uc9_2
+    usecase "Видалення користувача" as uc9_3
+
+    usecase "Моніторинг стану сервера" as uc9_4
+    usecase "Перегляд таблиць бази даних" as uc9_5
+    usecase "Експорт даних у CSV" as uc9_6
+  }
+
+  package "Зовнішні інтеграції" {
+    usecase "Надсилання показників сенсорів" as uc10
+    usecase "Надсилання листа для підтвердження" as uc11
+  }
+}
+
+' Зв'язки успадкування між акторами
+Guest <|-- User
+User <|-- Admin
+
+' Зв'язки асоціації (хто що використовує)
+Guest -- uc1
+Guest -- uc2
+Guest -- uc3
+Guest -- uc4
+Guest -- uc5
+
+User -- uc6
+User -- uc7
+User -- uc8
+
+Admin -- uc9
+
+SensorSimulator -- uc10
+EmailService -- uc11
+
+' Зв'язки включення (include)
+uc6 ..> uc6_1 : <<include>>
+uc6 ..> uc6_2 : <<include>>
+uc6 ..> uc6_3 : <<include>>
+
+uc9 ..> uc9_1 : <<include>>
+uc9 ..> uc9_2 : <<include>>
+uc9 ..> uc9_3 : <<include>>
+uc9 ..> uc9_4 : <<include>>
+uc9 ..> uc9_5 : <<include>>
+uc9 ..> uc9_6 : <<include>>
+
+uc1 ..> uc11 : <<include>>
+
+' Зв'язки розширення (extend)
+uc6 ..> uc2 : <<extend>>
+uc8 ..> uc2 : <<extend>>
+uc9 ..> uc2 : <<extend>>
+
+@enduml
+
+
+
+
+@startuml
+' Задаємо назву діаграми
+title UML Діаграма Компонентів
+
+!theme spacelab
+
+' --- Компоненти Клієнтської частини ---
+package "Клієнт (Браузер)" {
+  [Веб-інтерфейс\n(HTML, CSS, JS)] as Frontend
+  [Карта (Leaflet.js)] as MapLib
+  [Клієнт Socket.IO] as SocketClient
+
+  Frontend -- MapLib
+  Frontend -- SocketClient
+}
+
+' --- Компоненти Серверної частини ---
+package "Сервер (Node.js)" {
+  [Express Server\n(server.js)] as Server
+  
+  interface "REST API" as Api
+  interface "Web Routes" as WebRoutes
+  
+  Server - Api
+  Server - WebRoutes
+
+  package "Модулі" {
+    [Автентифікація\n(express-session, bcryptjs)] as Auth
+    [Керування БД\n(node-postgres)] as DBModule
+    [Сервер Socket.IO] as SocketServer
+    [Локалізація (i18n)] as I18n
+    [Обробка файлів (multer)] as Multer
+  }
+
+  Server -- Auth
+  Server -- DBModule
+  Server -- SocketServer
+  Server -- I18n
+  Server -- Multer
+}
+
+' --- Зовнішні системи та База Даних ---
+database "PostgreSQL" as DB
+node "Імітатор Сенсорів" as Simulator
+
+' --- Взаємозв'язки ---
+Frontend -down-> WebRoutes : HTTP Requests
+Frontend -down-> Api : AJAX/Fetch API
+
+SocketClient .down.> SocketServer : WebSocket
+
+WebRoutes .right.> DBModule : SQL
+Api .right.> DBModule : SQL
+Auth .right.> DBModule : SQL (сесії)
+
+SocketServer .up.> Frontend : Real-time updates
+
+Simulator -down-> Api : HTTP POST
+
+@enduml
+
+
+
+
+
+@startuml
+' Задаємо назву діаграми
+title Деталізована UML Діаграма Пакетів
+
+!theme spacelab
+
+' Загальна рамка для всього веб-застосунку
+frame "Web Application" {
+
+  ' --- Пакет для серверної логіки ---
+  package "Сервер (Backend)" {
+    component "[server.js]" as Server
+    
+    package "Конфігурація" as Config {
+      [package.json]
+      folder "locales" as Locales
+    }
+
+    package "Модулі (npm)" as Modules {
+      [express]
+      [ejs]
+      [pg]
+      [express-session]
+      [socket.io]
+      [i18n]
+      [multer]
+      [bcryptjs]
+    }
+
+    Server -- Modules : <<uses>>
+    Server -- Config : <<reads>>
+  }
+
+  ' --- Пакет для клієнтської частини ---
+  package "Клієнт (Frontend)" {
+    
+    package "Статичні Ресурси (public)" as Public {
+      package "Скрипти (js)" as JS {
+        folder "front" as js_front
+        folder "users" as js_users
+        folder "system" as js_system
+      }
+      package "Стилі (css)" as CSS {
+        folder "front" as css_front
+        folder "users" as css_users
+        folder "system" as css_system
+        folder "email" as css_email
+      }
+    }
+
+    package "Шаблони (views)" as Views {
+      [*.ejs]
+    }
+  }
+}
+
+' --- Зовнішні системи, що взаємодіють із застосунком ---
+node "Імітатор Сенсорів\n(simulator.js)" as Simulator
+database "База Даних\n(PostgreSQL)" as DB
+
+' --- Визначення залежностей між пакетами ---
+Server --> DB : "SQL запити"
+Server --> Views : "Рендерить"
+Server <-down- Simulator : "HTTP POST"
+
+Views ..> Public : "Підключає"
+Public ..> Server : "AJAX / WebSocket"
+
+@enduml
+
+
+
+
+
+
+@startuml
+' Задаємо назву діаграми
+title Діаграма Діяльності: Реєстрація та Автентифікація Користувача
+
+' Визначаємо "доріжки" для різних учасників процесу
+|Користувач|
+start
+:Відкриває сторінку реєстрації;
+
+|Клієнт (Браузер)|
+:Відображає форму реєстрації;
+
+|Користувач|
+:Заповнює дані\n(email, пароль, ім'я);
+:Натискає "Зареєструватися";
+
+|Клієнт (Браузер)|
+:Надсилає дані на сервер;
+
+|Сервер (Backend)|
+:Отримує дані форми;
+if (Валідація даних) then (успішна)
+  :Перевіряє, чи існує email в БД;
+  if (Email унікальний?) then (так)
+    :Хешує пароль;
+    :Зберігає нового користувача в БД\n(з токеном підтвердження);
+    :Надсилає лист для\nпідтвердження пошти;
+    |Клієнт (Браузер)|
+    :Показує повідомлення про\nнеобхідність підтвердження;
+    |Користувач|
+    :Перевіряє пошту;
+    :Переходить за посиланням\nз листа;
+    |Сервер (Backend)|
+    :Валідує токен підтвердження;
+    :Активує обліковий запис в БД;
+    |Клієнт (Браузер)|
+    :Перенаправляє на сторінку входу;
+  else (ні, email існує)
+    :Повертає помилку "Email вже використовується";
+    |Клієнт (Браузер)|
+    :Відображає помилку;
+    stop
+  endif
+else (невдала)
+  :Повертає помилку валідації;
+  |Клієнт (Браузер)|
+  :Відображає помилку біля полів форми;
+  stop
+endif
+
+|Користувач|
+:Заповнює форму входу;
+:Натискає "Увійти";
+
+|Клієнт (Браузер)|
+:Надсилає дані на сервер;
+
+|Сервер (Backend)|
+:Отримує дані для входу;
+:Знаходить користувача за email в БД;
+if (Користувача знайдено\nта пароль вірний?) then (так)
+  :Створює сесію;
+  |Клієнт (Браузер)|
+  :Зберігає cookie сесії;
+  :Перенаправляє на головну сторінку\nдля авторизованих;
+  |Користувач|
+  :Бачить особистий кабінет;
+  stop
+else (ні)
+  :Повертає помилку "Невірний логін або пароль";
+  |Клієнт (Браузер)|
+  :Відображає помилку;
+  stop
+endif
+
+@enduml

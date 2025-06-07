@@ -1,0 +1,36 @@
+# Ігноруємо Node.js модулі
+node_modules/
+
+# Логи та тимчасові файли
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# Файли середовища
+
+
+# Кеші та тимчасові файли
+*.tmp
+*.swp
+*.swo
+*.swn
+
+# Вихідні файли ОС
+.DS_Store
+Thumbs.db
+
+# Дані IDE та редакторів
+.vscode/
+.idea/
+*.iml
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+/uploads/
+
+.env
+backend-deployment.yaml
+.yaml1

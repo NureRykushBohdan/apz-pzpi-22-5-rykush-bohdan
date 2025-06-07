@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+spec:
+  replicas: 1 # Почнемо з однієї копії
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: backend-container
+        image: nenikk/apz-lab-backend:latest # ВАЖЛИВО: ваш Docker Hub образ
+        ports:
+        - containerPort: 3000
+        env:
+        - name: DATABASE_URL
+          value: "<YOUR_DATABASE_URL>"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+spec:
+  selector:
+    app: backend
+  type: LoadBalancer # Створює зовнішній балансувальник
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 3000

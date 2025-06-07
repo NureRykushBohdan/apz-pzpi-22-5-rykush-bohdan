@@ -1,0 +1,165 @@
+
+
+https://www.plantuml.com
+@startuml
+left to right direction
+
+
+actor "Зареєстрований користувач" as User
+
+
+rectangle "Cистеми моніторингу екологічного стану місцевості" {
+  usecase "Вхід в систему" as UC2
+  usecase "Вихід з системи" as UC1
+  usecase "Перегляд панелі моніторингу" as UC4
+  usecase "Перегляд карти датчиків" as UC5
+  usecase "Сканування QR-коду" as UC6
+  usecase "Отримання сповіщень" as UC7
+
+}
+
+
+User --> UC1
+User --> UC2
+User --> UC4
+User --> UC5
+User --> UC6
+User --> UC7
+@enduml
+
+
+
+
+
+@startuml
+!theme vibrant
+
+title Component Diagram
+
+node "Мобільний застосунок (Android)" {
+  [UI (Jetpack Compose)] as UI
+  [ViewModel (MVVM)] as VM
+  [Data Layer] as Data
+  [Background Worker (WorkManager)] as BGWorker
+
+  package "Апаратні та системні сервіси" {
+    [CameraX / ML Kit] as Camera
+    [Google Maps SDK] as MapsSDK
+    [Location Services] as GPS
+    [Notification Service] as NotifService
+  }
+
+  UI --> VM
+  VM --> Data
+  Data --> [Retrofit]
+  BGWorker --> Data
+  
+  UI ..> MapsSDK : (Відображення карти)
+  UI ..> Camera : (QR-сканер)
+  VM ..> GPS : (Запит геолокації)
+  BGWorker ..> NotifService : (Показ сповіщень)
+}
+
+node "Серверна інфраструктура (Node.js)" {
+  [Web Server (Express.js)] as Server
+  () "REST API" as API
+  [DB Interface (node-postgres)] as DBInterface
+  [Auth Logic (bcrypt, session)] as Auth
+
+
+  Server -left- API
+  Server --> Auth
+  Server --> DBInterface
+  Server --> Uploader
+}
+
+cloud "Зовнішні хмарні сервіси" {
+
+  [Google Maps Platform] as MapsAPI
+
+}
+
+database "База даних" {
+  [PostgreSQL] as PGSQL
+}
+
+' --- Зв'язки між основними вузлами ---
+Retrofit ..> API : (HTTP/S запити)
+MapsSDK ..> MapsAPI : (Завантаження тайлів мапи)
+
+
+DBInterface --> PGSQL : (SQL запити)
+
+@enduml
+
+
+
+
+@startuml
+title State Diagram:
+
+
+state "ПочатковаПеревірка"    as ПК
+state "Аутентифікація"         as АУ
+state "ЗавантаженняДаних"      as ЗД
+state "СтанПомилки"            as СП
+state "ГоловнийЕкран"          as ГЕ
+state "СкануванняQR"           as СК
+state "ДеталіДатчика"          as ДД
+
+state "Вкладка 'Головна'"      as NearestSensorView
+state "Вкладка 'Карта'"        as MapView
+
+
+[*] --> ПК
+
+
+state ПК {
+  note right
+    Перевірка збереженої сесії
+    в PersistentCookieJar
+  end note
+}
+ПК --> АУ  : [Немає сесії]
+ПК --> ЗД  : [Сесія існує]
+
+
+state АУ {
+  note left
+    Екран входу / реєстрації
+  end note
+}
+АУ --> ЗД  : Успішний вхід
+
+
+state ЗД {
+  note right
+    Отримання геолокації,
+    завантаження даних з сервера
+  end note
+}
+ЗД --> NearestSensorView : Дані успішно завантажено
+ЗД --> СП               : Помилка завантаження
+
+
+state ГЕ {
+  NearestSensorView -right-> MapView : Натиснуто "Карта"
+  MapView           -left->  NearestSensorView : Натиснуто "Головна"
+}
+
+
+ГЕ --> СК   : Натиснуто "Сканувати"
+СК  --> ГЕ   : Скасування
+СК  --> ДД   : QR-код відскановано
+ДД  --> ГЕ   : Закрити деталі
+
+
+ГЕ --> АУ   : Вихід з системи (Logout)
+СП  -down-> АУ   : Спробувати знову / Вийти
+
+
+АУ --> [*] : Закрити додаток
+ГЕ --> [*] : Закрити додаток
+СП  --> [*] : Закрити додаток
+
+@enduml
