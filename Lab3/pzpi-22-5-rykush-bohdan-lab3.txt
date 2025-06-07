@@ -197,7 +197,7 @@ title UML Діаграма Компонентів
 
 !theme spacelab
 
-' --- Компоненти Клієнтської частини ---
+'  Компоненти Клієнтської частини 
 package "Клієнт (Браузер)" {
   [Веб-інтерфейс\n(HTML, CSS, JS)] as Frontend
   [Карта (Leaflet.js)] as MapLib
@@ -207,7 +207,7 @@ package "Клієнт (Браузер)" {
   Frontend -- SocketClient
 }
 
-' --- Компоненти Серверної частини ---
+'  Компоненти Серверної частини 
 package "Сервер (Node.js)" {
   [Express Server\n(server.js)] as Server
   
@@ -232,11 +232,11 @@ package "Сервер (Node.js)" {
   Server -- Multer
 }
 
-' --- Зовнішні системи та База Даних ---
+'  Зовнішні системи та База Даних 
 database "PostgreSQL" as DB
 node "Імітатор Сенсорів" as Simulator
 
-' --- Взаємозв'язки ---
+'  Взаємозв'язки 
 Frontend -down-> WebRoutes : HTTP Requests
 Frontend -down-> Api : AJAX/Fetch API
 
@@ -265,7 +265,7 @@ title Деталізована UML Діаграма Пакетів
 ' Загальна рамка для всього веб-застосунку
 frame "Web Application" {
 
-  ' --- Пакет для серверної логіки ---
+  '  Пакет для серверної логіки 
   package "Сервер (Backend)" {
     component "[server.js]" as Server
     
@@ -289,7 +289,7 @@ frame "Web Application" {
     Server -- Config : <<reads>>
   }
 
-  ' --- Пакет для клієнтської частини ---
+  '  Пакет для клієнтської частини 
   package "Клієнт (Frontend)" {
     
     package "Статичні Ресурси (public)" as Public {
@@ -312,11 +312,11 @@ frame "Web Application" {
   }
 }
 
-' --- Зовнішні системи, що взаємодіють із застосунком ---
+'  Зовнішні системи, що взаємодіють із застосунком 
 node "Імітатор Сенсорів\n(simulator.js)" as Simulator
 database "База Даних\n(PostgreSQL)" as DB
 
-' --- Визначення залежностей між пакетами ---
+'  Визначення залежностей між пакетами 
 Server --> DB : "SQL запити"
 Server --> Views : "Рендерить"
 Server <-down- Simulator : "HTTP POST"
