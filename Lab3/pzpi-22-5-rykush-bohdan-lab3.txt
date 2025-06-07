@@ -307,7 +307,7 @@ frame "Web Application" {
     }
 
     package "Шаблони (views)" as Views {
-      [*.ejs]
+      [.ejs]
     }
   }
 }

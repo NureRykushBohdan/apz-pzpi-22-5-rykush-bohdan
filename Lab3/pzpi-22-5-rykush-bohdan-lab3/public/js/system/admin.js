@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 1. УНІВЕРСАЛЬНІ ДОПОМІЖНІ ФУНКЦІЇ ---
 
-    /**
+    /
      * Рендерить таблицю з даними для вкладки "Управління даними".
      * @param {Array} data - Масив об'єктів для відображення.
      * @param {string} containerId - ID контейнера, куди буде вставлено таблицю.
@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
         addDataTableSortListeners(data, containerId);
     };
 
-    /**
+    /
      * Додає логіку сортування до таблиць даних.
      * @param {Array} data - Оригінальний (несортований) масив даних.
      * @param {string} containerId - ID контейнера таблиці.
