@@ -8,7 +8,7 @@ yarn-error.log*
 *.log
 
 # Файли середовища
-
+.env
 
 # Кеші та тимчасові файли
 *.tmp
@@ -31,6 +31,4 @@ Thumbs.db
 *.sw?
 /uploads/
 
-.env
 backend-deployment.yaml
-.yaml1
