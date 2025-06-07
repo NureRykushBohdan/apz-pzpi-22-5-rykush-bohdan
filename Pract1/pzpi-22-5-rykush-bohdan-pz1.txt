@@ -1,0 +1,95 @@
+Патерн Adapter в архітектурі
+програмного забезпечення
+Виконав:
+студ. ПЗПІ-22-5
+Рикуш Богдан
+Що таке патерн Adapter?
+Структурний патерн проектування.
+Дозволяє об’єктам з несумісними інтерфейсами
+працювати разом.
+Використовується для адаптації одного інтерфейсу до
+іншого.
+Застосовується для інтеграції старих систем з новими.
+Призначення патерну
+Забезпечує сумісність між класами з різними інтерфейсами.
+Дозволяє повторно використовувати існуючий код без його
+модифікації.
+Зменшує залежність між компонентами системи.
+Структура патерну
+Target: Інтерфейс, який очікує клієнт.
+Adaptee: Клас з несумісним інтерфейсом, який
+потрібно адаптувати.
+Adapter: Клас, що реалізує Target і викликає
+методи Adaptee.
+Client: Код, який використовує Target
+інтерфейс.
+Типи адаптерів
+Об’єктний адаптер: Використовує композицію для зв’язку з
+Adaptee.
+Класовий адаптер: Використовує множинне успадкування
+(застосовується рідше).
+Код без адаптера (Java)
+class OldPrinter {
+ void printOldFormat(String text) {
+ System.out.println("Old format: " + text);
+ }
+}
+class Client {
+ void printDocument(String text) {
+ OldPrinter printer = new OldPrinter();
+ printer.printOldFormat(text); // Несумісний інтерфейс
+ }
+}
+Клієнт залежить від старого
+інтерфейсу OldPrinter, що
+обмежує гнучкість.
+Застосування
+Adapter (Java)
+interface Printer {
+ void print(String text);
+}
+class OldPrinter {
+ void printOldFormat(String text) {
+ System.out.println("Old format: " + text);
+ }
+}
+class PrinterAdapter implements Printer {
+ private OldPrinter oldPrinter;
+ public PrinterAdapter(OldPrinter oldPrinter) {
+ this.oldPrinter = oldPrinter;
+ }
+}
+ public void print(String text) {
+ oldPrinter.printOldFormat(text);
+ }
+}
+class Client {
+ private Printer printer;
+ public Client(Printer printer) {
+ this.printer = printer;
+ }
+ void printDocument(String text) {
+ printer.print(text);
+ }
+}
+Переваги після адаптера
+Клієнт працює з уніфікованим інтерфейсом Printer.
+Легко підключити нові принтери, що реалізують Printer.
+Старий код OldPrinter залишився незмінним.
+ Практичне застосування
+Інтеграція зі старими системами (legacy code).
+Робота з бібліотеками з несумісними API.
+Забезпечення гнучкості при зміні зовнішніх сервісів.
+Приклад: Адаптація старого API платіжної системи до нового
+інтерфейсу.
+ Висновки
+Патерн Adapter забезпечує сумісність між несумісними
+інтерфейсами.
+Дозволяє використовувати старий код без змін.
+Покращує модульність і гнучкість системи.
+Застосовується в реальних проєктах для інтеграції та
+масштабування.
+Дякую за увагу!
+
+Посилання на відео :
+https://youtu.be/LPBvs79ll0c
