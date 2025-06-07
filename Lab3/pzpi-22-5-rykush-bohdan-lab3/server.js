@@ -1,6 +1,6 @@
 require("dotenv").config();
 const express = require("express");
-const path =require("path");
+const path = require("path");
 const { Pool } = require("pg");
 const bcrypt = require("bcryptjs");
 const session = require("express-session");
@@ -14,11 +14,29 @@ const cookieParser = require("cookie-parser");
 const { createServer } = require('http');
 const { Server } = require("socket.io");
 const si = require('systeminformation');
+const i18n = require("i18n");
 
-// --- 1. ІНІЦІАЛІЗАЦІЯ ---
+const csv = require('csv-parser');
+const { Readable } = require('stream');
+
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer);
+
+// --- НАЛАШТУВАННЯ i18n --- // <-- ДОДАНО
+i18n.configure({
+    locales: ['uk', 'en'],
+    directory: path.join(__dirname, 'locales'),
+    defaultLocale: 'uk',
+    cookie: 'lang',
+    objectNotation: true,
+});
+
+
+const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 5 * 1024 * 1024 },
+});
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -27,6 +45,23 @@ app.use(cookieParser());
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
+
+
+// --- МІДЛВЕР ДЛЯ i18n --- // <-- ДОДАНО
+app.use(i18n.init);
+
+// 3. Додаємо діагностичний мідлвер
+app.use((req, res, next) => {
+    console.log(`\n--- Новий запит: ${req.method} ${req.path} ---`);
+    console.log(`[ДІАГНОСТИКА] Cookie 'lang', що прийшов від браузера:`, req.cookies.lang);
+    console.log(`[ДІАГНОСТИКА] Мова, визначена i18n (req.getLocale()):`, req.getLocale());
+    res.locals.__ = res.__;
+    res.locals.lang = req.getLocale(); // Передаємо поточну мову в шаблони
+    next();
+});
+
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
 
 
 const pool = new Pool({
@@ -55,6 +90,77 @@ app.use(session({
     }
 }));
 
+// Додайте цей маршрут у ваш server.js
+
+app.post('/api/admin/import', upload.single('csvFile'), async (req, res) => {
+    // Перевірка прав адміністратора
+    if (!req.session.user || req.session.user.role !== 'admin') {
+        return res.status(403).send('Доступ заборонено');
+    }
+
+    const { tableName } = req.body;
+    const file = req.file;
+
+    if (!file) {
+        return res.status(400).send('Файл не було завантажено.');
+    }
+
+    if (!['sensors', 'sensor_readings'].includes(tableName)) {
+        return res.status(400).send('Неприпустима назва таблиці.');
+    }
+
+    const results = [];
+    const stream = Readable.from(file.buffer).pipe(csv());
+    
+    stream.on('data', (data) => results.push(data));
+    
+    stream.on('end', async () => {
+        if (results.length === 0) {
+            return res.status(400).send('CSV файл порожній або має невірний формат.');
+        }
+
+        const client = await pool.connect();
+        try {
+            await client.query('BEGIN');
+
+            for (const row of results) {
+                // Очищення даних (приклад: перетворення порожніх рядків на null)
+                for (const key in row) {
+                    if (row[key] === '') {
+                        row[key] = null;
+                    }
+                }
+
+                const columns = Object.keys(row).join(', ');
+                const values = Object.values(row);
+                const placeholders = values.map((_, i) => `$${i + 1}`).join(', ');
+                
+                const query = `INSERT INTO ${tableName} (${columns}) VALUES (${placeholders})`;
+                await client.query(query, values);
+            }
+
+            await client.query('COMMIT');
+            // Перенаправлення назад з повідомленням про успіх
+            req.session.message = { type: 'success', text: `Successfully imported ${results.length} rows into ${tableName}` };
+            res.redirect('/admin');
+
+        } catch (err) {
+            await client.query('ROLLBACK');
+            console.error('Помилка імпорту CSV:', err);
+            // Перенаправлення назад з повідомленням про помилку
+            req.session.message = { type: 'error', text: `Error importing data: ${err.message}` };
+            res.redirect('/admin');
+        } finally {
+            client.release();
+        }
+    });
+
+    stream.on('error', (err) => {
+        console.error('Помилка парсингу CSV:', err);
+        req.session.message = { type: 'error', text: 'Failed to parse CSV file.' };
+        res.redirect('/admin');
+    });
+});
 const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -72,10 +178,31 @@ pool.query('SELECT NOW()', (err, res) => {
     }
 });
 
+// --- Маршрут для зміни мови --- // <-- ДОДАНО
+
+app.get('/lang/:lang', (req, res) => {
+    const { lang } = req.params;
+    console.log(`[ДІАГНОСТИКА] Отримано запит на зміну мови на: ${lang}`);
+    if (['uk', 'en'].includes(lang)) {
+        res.cookie('lang', lang, { maxAge: 900000, httpOnly: true });
+        console.log(`[ДІАГНОСТИКА] Cookie 'lang' було встановлено на: ${lang}`);
+    } else {
+        console.log(`[ДІАГНОСТИКА] Невірна мова: ${lang}. Cookie не встановлено.`);
+    }
+    const referer = req.header('Referer') || '/';
+    res.redirect(referer);
+});
 // Головна сторінка
 app.get("/", (req, res) => {
-    if (!req.session.user && req.cookies.user) {
-        req.session.user = JSON.parse(req.cookies.user);
+    console.log("[ДІАГНОСТИКА] Рендеринг головної сторінки. Поточна мова:", res.locals.lang);
+    try {
+        if (!req.session.user && req.cookies.user) {
+            req.session.user = JSON.parse(req.cookies.user);
+        }
+    } catch (error) {
+        console.error("Помилка розбору cookie користувача:", error);
+        res.clearCookie("user");
+        req.session.user = null;
     }
     res.render("front/index", { title: "Головна сторінка", user: req.session.user });
 });
@@ -411,11 +538,7 @@ const s3 = new S3Client({
     }
 });
 
-// Налаштування Multer для DigitalOcean Spaces
-const upload = multer({
-    storage: multer.memoryStorage(),
-    limits: { fileSize: 5 * 1024 * 1024 },
-});
+
 
 // В файлі server.js
 
@@ -818,6 +941,88 @@ io.on('connection', (socket) => {
         } catch (e) { console.error('Помилка збору статистики:', e); }
     }, 2000);
     socket.on('disconnect', () => clearInterval(intervalId));
+});
+
+app.post('/api/readings', async (req, res) => {
+  try {
+    // Деструктуруємо з тіла запиту
+    const { sensor_id, status, data_values } = req.body;
+
+    // Перевіряємо наявність обов’язкових полів:
+    // – sensor_id (може бути числом або рядком, залежно від того, як у вас налаштовано),
+    // – status (рядок),
+    // – data_values (об’єкт, який точно існує, але поля всередині можуть бути null).
+    if (sensor_id == null || typeof status !== 'string' || typeof data_values !== 'object') {
+      return res.status(400).json({ error: 'Missing or invalid required fields: sensor_id, status, data_values must be present' });
+    }
+
+    // Тепер перевіримо всередині data_values кожен із семи ключів.
+    // Якщо якийсь із них відсутній у запиті, явно додаємо поле з null.
+    const {
+      ph        = null,
+      co2       = null,
+      so2       = null,
+      pm25      = null,
+      db_level  = null,
+      salinity  = null,
+      temperature = null
+    } = data_values;
+
+    // Переконаємося, що отримали або число/рядок, або null для кожного з полів:
+    function isValidField(val) {
+      return val === null || typeof val === 'number' || typeof val === 'string';
+    }
+    if (
+      !isValidField(ph)       ||
+      !isValidField(co2)      ||
+      !isValidField(so2)      ||
+      !isValidField(pm25)     ||
+      !isValidField(db_level) ||
+      !isValidField(salinity) ||
+      !isValidField(temperature)
+    ) {
+      return res.status(400).json({ error: 'Each data_values field must be a number/string or null' });
+    }
+
+    // Перестворюємо об’єкт data_values, щоб упевнитися, що всі сім ключів точно існують:
+    const normalizedData = {
+      ph:         ph,
+      co2:        co2,
+      so2:        so2,
+      pm25:       pm25,
+      db_level:   db_level,
+      salinity:   salinity,
+      temperature: temperature
+    };
+
+    // Формуємо JSON, який запишемо в БД. 
+    // Залежно від схеми таблиці, можливо, data_values — це просто JSONB-колонка.
+    const queryText = `
+      INSERT INTO sensor_readings (sensor_id, status, data_values)
+      VALUES ($1, $2, $3)
+      RETURNING reading_id
+    `;
+    const values = [
+      sensor_id,
+      status,
+      normalizedData  // передаємо вже гарантовано «повний» об’єкт із семи ключів
+    ];
+
+    const result = await pool.query(queryText, values);
+
+    console.log(
+      `Отримано нові показники від сенсора ${sensor_id}. ` +
+      `Записано в БД з ID: ${result.rows[0].reading_id}`
+    );
+    return res.status(201).json({
+      success:    true,
+      reading_id: result.rows[0].reading_id
+    });
+
+  } catch (err) {
+    console.error('Помилка при збереженні показників з імітатора:', err);
+    return res.status(500).json({ error: 'Server error while saving reading' });
+  }
 });
 
 // --- 6. ЗАПУСК СЕРВЕРА ---

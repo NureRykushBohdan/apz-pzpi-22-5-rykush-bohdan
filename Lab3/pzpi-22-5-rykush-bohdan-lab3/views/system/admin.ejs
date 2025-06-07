@@ -1,103 +1,147 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="<%= lang %>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Контакти - EcoGuard</title>
-
-<link rel="stylesheet" href="/style/system/admin.css">
+    <title><%= __('Admin Panel') %> - EcoGuard</title>
+    <link rel="stylesheet" href="/style/system/admin.css">
     <link rel="stylesheet" href="/style/partials/footer_header.css">
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
-  <%- include('../partials/header') %>
-   <main class="admin-main" data-users='<%- JSON.stringify(users || []) %>'>
-        <h1>Панель адміністратора</h1>
+    <%- include('../partials/header') %>
+    <main class="admin-main" data-users='<%- JSON.stringify(users || []) %>'>
+        <h1><%= __('Admin Panel') %></h1>
 
         <div class="admin-tabs">
-            <button class="tab-link active" data-tab="users">Управління користувачами</button>
-            <button class="tab-link" data-tab="data">Управління даними</button>
-            <button class="tab-link" data-tab="status">Стан сервера</button>
+            <button class="tab-link active" data-tab="users"><%= __('User Management') %></button>
+            <button class="tab-link" data-tab="data"><%= __('Data Management') %></button>
+            <button class="tab-link" data-tab="status"><%= __('Server Status') %></button>
         </div>
 
         <div id="users" class="tab-content active">
-            <h2>Список користувачів системи</h2>
+            <h2><%= __('System User List') %></h2>
             <div class="filter-search-bar">
-                <input type="text" id="user-search-input" placeholder="Пошук за іменем або email...">
+                <input type="text" id="user-search-input" placeholder="<%= __('Search by name or email...') %>">
             </div>
             <div class="table-container" id="users-table-container"></div>
         </div>
         
         <div id="data" class="tab-content">
-            <h2>Управління даними системи</h2>
+            <h2><%= __('System Data Management') %></h2>
             <div class="data-management-panel">
-                 <div class="data-tabs">
-                    <button class="data-tab-link" data-table="sensors">Сенсори</button>
-                    <button class="data-tab-link" data-table="readings">Показники</button>
-                    <button class="data-tab-link" data-table="messages">Повідомлення</button>
+                <div class="data-tabs">
+                    <button class="data-tab-link" data-table="sensors"><%= __('Sensors') %></button>
+                    <button class="data-tab-link" data-table="readings"><%= __('Readings') %></button>
+                    <button class="data-tab-link" data-table="messages"><%= __('Messages') %></button>
                 </div>
                 <div class="data-content">
                     <div id="sensors-content" class="data-table-content">
                         <div class="content-header">
-                            <h3>Таблиця: sensors</h3>
-                            <a href="/api/admin/export/sensors" class="export-btn">Експорт в CSV</a>
+                            <h3><%= __('Table:') %> sensors</h3>
+                            <a href="/api/admin/export/sensors" class="export-btn"><%= __('Export to CSV') %></a>
                         </div>
                         <div class="filter-search-bar">
-                            <input type="text" id="sensor-search-input" placeholder="Пошук...">
+                            <input type="text" id="sensor-search-input" placeholder="<%= __('Search...') %>">
                             <select id="sensor-type-filter">
-                                <option value="all">Всі типи</option>
-                                <option value="air">Повітря</option>
-                                <option value="water">Вода</option>
-                                <option value="noise">Шум</option>
+                                <option value="all"><%= __('All types') %></option>
+                                <option value="air"><%= __('Air') %></option>
+                                <option value="water"><%= __('Water') %></option>
+                                <option value="noise"><%= __('Noise') %></option>
                             </select>
                         </div>
                         <div class="table-container" id="sensors-table-container"></div>
                     </div>
                     <div id="readings-content" class="data-table-content" style="display: none;">
                         <div class="content-header">
-                            <h3>Таблиця: sensor_readings (останні 100)</h3>
-                            <a href="/api/admin/export/sensor_readings" class="export-btn">Експорт в CSV</a>
+                            <h3><%= __('Table: sensor_readings (last 100)') %></h3>
+                            <a href="/api/admin/export/sensor_readings" class="export-btn"><%= __('Export to CSV') %></a>
                         </div>
                         <div class="table-container" id="readings-table-container"></div>
                     </div>
                      <div id="messages-content" class="data-table-content" style="display: none;">
                         <div class="content-header">
-                            <h3>Таблиця: messages</h3>
-                            <a href="/api/admin/export/messages" class="export-btn">Експорт в CSV</a>
+                            <h3><%= __('Table: messages') %></h3>
+                            <a href="/api/admin/export/messages" class="export-btn"><%= __('Export to CSV') %></a>
                         </div>
                         <div class="table-container" id="messages-table-container"></div>
                     </div>
+                     <div class="import-section">
+        <h3><%= __('Import data from CSV') %></h3>
+        <p><%= __('The CSV file headers must exactly match the database table column names.') %></p>
+        
+        <form id="import-csv-form" action="/api/admin/import" method="POST" enctype="multipart/form-data">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="table-select"><%= __('Target Table:') %></label>
+                    <select id="table-select" name="tableName" required>
+                        <option value="sensors"><%= __('Sensors') %></option>
+                        <option value="sensor_readings"><%= __('Readings') %></option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="csv-file-input"><%= __('Select CSV File:') %></label>
+                    <input type="file" id="csv-file-input" name="csvFile" accept=".csv" required>
+                </div>
+            </div>
+            <button type="submit" class="import-btn"><%= __('Import') %></button>
+        </form>
+        <div id="import-status"></div>
+    </div>
+    <div class="data-management-panel">
+        </div>
+</div>
                 </div>
             </div>
         </div>
 
         <div id="status" class="tab-content">
-            <h2>Стан сервера та статистика</h2>
+            <h2><%= __('Server Status and Statistics') %></h2>
             <div class="status-grid">
-                <div class="status-widget"><h4>Навантаження CPU</h4><p class="large-text"><span id="cpu-load">0</span>%</p></div>
-                <div class="status-widget"><h4>Використання RAM</h4><p class="large-text"><span id="mem-usage">0</span>%</p><p id="mem-info">Завантаження...</p></div>
-                <div class="status-widget"><h4>Операційна система</h4><p id="os-info">Завантаження...</p></div>
+                <div class="status-widget"><h4><%= __('CPU Load') %></h4><p class="large-text"><span id="cpu-load">0</span>%</p></div>
+                <div class="status-widget"><h4><%= __('RAM Usage') %></h4><p class="large-text"><span id="mem-usage">0</span>%</p><p id="mem-info"><%= __('Loading...') %></p></div>
+                <div class="status-widget"><h4><%= __('Operating System') %></h4><p id="os-info"><%= __('Loading...') %></p></div>
             </div>
-            <h3>Статистика Бази Даних</h3>
+            <h3><%= __('Database Statistics') %></h3>
             <div class="status-grid">
-                <div class="status-widget"><h4>Користувачі</h4><p class="large-text" id="db-users">0</p></div>
-                <div class="status-widget"><h4>Сенсори</h4><p class="large-text" id="db-sensors">0</p></div>
-                <div class="status-widget"><h4>Показники</h4><p class="large-text" id="db-readings">0</p></div>
-                <div class="status-widget"><h4>Повідомлення</h4><p class="large-text" id="db-messages">0</p></div>
+                <div class="status-widget"><h4><%= __('Users') %></h4><p class="large-text" id="db-users">0</p></div>
+                <div class="status-widget"><h4><%= __('Sensors') %></h4><p class="large-text" id="db-sensors">0</p></div>
+                <div class="status-widget"><h4><%= __('Readings') %></h4><p class="large-text" id="db-readings">0</p></div>
+                <div class="status-widget"><h4><%= __('Messages') %></h4><p class="large-text" id="db-messages">0</p></div>
             </div>
         </div>
     </main>
 
     <%- include('../partials/footer') %>
-
-
     
-<script src="/js/partials/footer.js" defer></script>
-<script src="/js/system/admin.js" defer></script>
-<script>
-        
+    <script>
+        const pageTranslations = {
+            searchByNameOrEmail: "<%= __('Search by name or email...') %>",
+            search: "<%= __('Search...') %>",
+            table: "<%= __('Table:') %>",
+            exportToCsv: "<%= __('Export to CSV') %>",
+            allTypes: "<%= __('All types') %>",
+            air: "<%= __('Air') %>",
+            water: "<%= __('Water') %>",
+            noise: "<%= __('Noise') %>",
+            id: "<%= __('ID') %>",
+            name: "<%= __('Name') %>",
+            email: "<%= __('Email') %>",
+            role: "<%= __('Role') %>",
+            verified: "<%= __('Verified') %>",
+            actions: "<%= __('Actions') %>",
+            makeAdmin: "<%= __('Make Admin') %>",
+            makeUser: "<%= __('Make User') %>",
+            delete: "<%= __('Delete') %>",
+            yes: "<%= __('Yes') %>",
+            no: "<%= __('No') %>",
+            confirmDeleteUser: "<%= __('Are you sure you want to delete this user?') %>"
+        };
     </script>
+    
+    <script src="/js/partials/footer.js" defer></script>
+    <script src="/js/system/admin.js" defer></script>
 </body>
 </html>

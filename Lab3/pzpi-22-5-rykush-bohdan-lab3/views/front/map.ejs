@@ -1,80 +1,75 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="<%= lang %>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Вхід - EcoGuard</title>
-    
-    <link rel="stylesheet" href="/style/front/map.css"> 
-    <link rel="icon" href="https://placehold.co/32x32/3498db/ffffff?text=EG" type="image/x-icon">
-   
-<!DOCTYPE html>
-<html lang="uk">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Карта моніторингу - EcoGuard</title>
+    <title><%= __('Monitoring Map') %> - EcoGuard</title>
     
     <link rel="stylesheet" href="/style/front/styles.css"> 
-    
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-    
-    <link rel="stylesheet" href="/style/map.css"> 
-    
+    <link rel="stylesheet" href="/style/front/map.css"> 
     <link rel="icon" href="https://placehold.co/32x32/3498db/ffffff?text=EG" type="image/x-icon">
 </head>
 <body>
 
-        <%- include('../partials/header') %>
+    <%- include('../partials/header') %>
     
     <main class="map-page-main">
         <aside class="map-sidebar">
             <div class="sidebar-section">
-    <h3>Тип даних моніторингу</h3>
-    <div class="filter-group" id="layer-filter-group">
-        <label>
-            <input type="radio" name="layer-toggle" value="all" checked>
-            <span>Всі типи</span>
-        </label>
-        <label>
-            <input type="radio" name="layer-toggle" value="air">
-            <span>Якість повітря</span>
-        </label>
-        <label>
-            <input type="radio" name="layer-toggle" value="water">
-            <span>Якість води</span>
-        </label>
-        <label>
-            <input type="radio" name="layer-toggle" value="noise">
-            <span>Рівень шуму</span>
-        </label>
-    </div>
-</div>
+                <h3><%= __('Monitoring Data Type') %></h3>
+                <div class="filter-group" id="layer-filter-group">
+                    <label>
+                        <input type="radio" name="layer-toggle" value="all" checked>
+                        <span><%= __('All types') %></span>
+                    </label>
+                    <label>
+                        <input type="radio" name="layer-toggle" value="air">
+                        <span><%= __('Air quality') %></span>
+                    </label>
+                    <label>
+                        <input type="radio" name="layer-toggle" value="water">
+                        <span><%= __('Water quality') %></span>
+                    </label>
+                    <label>
+                        <input type="radio" name="layer-toggle" value="noise">
+                        <span><%= __('Noise level') %></span>
+                    </label>
+                </div>
+            </div>
             <div class="sidebar-section">
-                <h3>Легенда</h3>
+                <h3><%= __('Legend') %></h3>
                 <ul class="legend">
-                    <li><span class="legend-icon" style="background-color: #2ecc71;"></span> - Добре</li>
-                    <li><span class="legend-icon" style="background-color: #f1c40f;"></span> - Помірно</li>
-                    <li><span class="legend-icon" style="background-color: #e74c3c;"></span> - Погано</li>
-                    <li><span class="legend-icon" style="background-color: #95a5a6;"></span> - Немає даних</li>
+                    <li><span class="legend-icon" style="background-color: #2ecc71;"></span> - <%= __('Good') %></li>
+                    <li><span class="legend-icon" style="background-color: #f1c40f;"></span> - <%= __('Moderate') %></li>
+                    <li><span class="legend-icon" style="background-color: #e74c3c;"></span> - <%= __('Bad') %></li>
+                    <li><span class="legend-icon" style="background-color: #95a5a6;"></span> - <%= __('No data') %></li>
                 </ul>
             </div>
              <div class="sidebar-section">
-                <h3>Інформація</h3>
-                <p id="sidebar-info">Наведіть курсор на сенсор для отримання детальної інформації.</p>
+                <h3><%= __('Information') %></h3>
+                <p id="sidebar-info"><%= __('Hover over a sensor to get detailed information.') %></p>
             </div>
         </aside>
 
         <div id="map"></div>
     </main>
 
+    <%- include('../partials/footer') %>
 
-      <%- include('../partials/footer') %>
- <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    
+    <script>
+        const mapTranslations = {
+            sensor: "<%= __('Sensor:') %>",
+            type: "<%= __('Type:') %>",
+            status: "<%= __('Status:') %>",
+            readings: "<%= __('Readings:') %>",
+            lastUpdated: "<%= __('Last updated:') %>"
+        };
+    </script>
     
     <script src="/js/front/map.js" defer></script>
-<script src="/js/partials/footer.js" defer></script>
-
- 
+    <script src="/js/partials/footer.js" defer></script>
 </body>
 </html>
