@@ -57,9 +57,34 @@
 
 Завдяки виконанню цієї роботи вдалося поглибити знання про структурні патерни проєктування та на практиці застосувати їх для вирішення реальних завдань інтеграції компонентів у програмуванні.
 
----
 
- МАТЕРІАЛИ ПРЕЗЕНТАЦІЇ
+
+
+
+ДОДАТОК А  
+
+Посилання на відеозапис доповіді та текст хронологічного опису доповіді  
+
+Відеозапис доповіді на YouTube: https://youtu.be/LPBvs79ll0c
+
+Хронологічний опис відео:  
+
+00:00 - Вступ
+00:08 - Що таке патерн Adapter?
+00:20 - Призначення патерну
+00:42 - Структура патерну
+00:50 - Типи адаптерів
+01:15 - Код без адаптера (Java)
+01:32 - Застосування Adapter (Java)
+01:50 - Переваги після адаптера
+02:08 -  Практичне застосування
+02:24 - Висновки
+02:42 - Кінець
+
+
+
+ДОДАТОК Б 
+
 
 Слайд 1: Титульний
  Патерн Adapter в архітектурі програмного забезпечення
@@ -166,8 +191,45 @@ class Client {
 
 Слайд 11: Дякую за увагу!
 
----
 
-Посилання на відео:
+Додаток В (приклади програмного коду)
 
-https://youtu.be/LPBvs79ll0c
+java
+// 1. Цільовий інтерфейс
+interface Printer {
+    void print(String text);
+}
+
+// 2. Клас, що адаптується (не змінюється)
+class OldPrinter {
+    void printOldFormat(String text) {
+        System.out.println("Old format: " + text);
+    }
+}
+
+// 3. Адаптер
+class PrinterAdapter implements Printer {
+    private OldPrinter oldPrinter;
+
+    public PrinterAdapter(OldPrinter oldPrinter) {
+        this.oldPrinter = oldPrinter;
+    }
+
+    @Override
+    public void print(String text) {
+        oldPrinter.printOldFormat(text); // Делегування виклику
+    }
+}
+
+// 4. Клієнт
+class Client {
+    private Printer printer;
+
+    public Client(Printer printer) {
+        this.printer = printer;
+    }
+
+    void printDocument(String text) {
+        printer.print(text); // Робота через уніфікований інтерфейс
+    }
+}
